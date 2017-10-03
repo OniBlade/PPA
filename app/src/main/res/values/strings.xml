@@ -1,0 +1,111 @@
+<resources>
+    <string name="app_name">Privacy Application</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Configuração</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <integer name="ACCEPT">1</integer>
+    <integer name="DENY">2</integer>
+    <integer name="NEGOTIATE">3</integer>
+
+    <string name="ACCEPT">Autorizar</string>
+    <string name="NEGOTIATE">Negociar</string>
+    <string name="DENY">Negar</string>
+
+
+    <string name="objeto_field">Field</string>
+    <string name="objeto_motivo">Motivo</string>
+
+    <string name="objeto_solicitante">Solicitante</string>
+    <string name="objeto_solicitante_atributo">Atributos</string>
+    <string name="objeto_solicitante_valores">Valores</string>
+
+    <string name="objeto_dados">Dados</string>
+    <string name="objeto_dados_tipo">Tipo</string>
+
+    <string name="objeto_decisao_inferida">DecisaoInferida</string>
+    <string name="objeto_decisao_inferida_atributo">Atributo</string>
+    <string name="objeto_decisao_inferida_atributo_nivelconfianca">NivelConfianca</string>
+    <string name="objeto_decisao_inferida_atributo_codigo">Codigo</string>
+    <string name="objeto_decisao_inferida_atributo_contem">Contem</string>
+
+    <string name="objeto_decisao_usuario_atributo_codigo">Codigo</string>
+    <string name="objeto_decisao_usuario_atributo_descricao">Descricao</string>
+    <string name="objeto_decisao_usuario">DecisaoUsuario</string>
+    <string name="objeto_decisao_usuario_atributo">Atributo</string>
+    <string name="collection">request</string>
+    <string name="nome_banco">dbAgent</string>
+    <string name="objeto_verificar_usuario">VerificarUsuario</string>
+    <string name="objeto_decisao_usuario_atributo_valor">Valor</string>
+    <string name="action_exit">Sair</string>
+
+
+    <string name="authentication">aGhrbHRsZ2o6S2lLUnNVRVlQRWRm</string>
+    <string name="user_decision_attributes"> CREATE TABLE IF NOT EXISTS `user_decision_attributes` (
+    `information`	varchar ( 45 ),
+    `state`	integer,
+    `user_decision_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `user_decision_id`	integer NOT NULL,
+    `data_atttribute_id`	integer NOT NULL,
+    FOREIGN KEY(`user_decision_id`) REFERENCES `user_decision`(`user_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY(`data_atttribute_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    );</string>
+    <string name="user_decision">CREATE TABLE IF NOT EXISTS `user_decision` (
+    `user_decision_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+    );</string>
+    <string name="request">CREATE TABLE IF NOT EXISTS `request` (
+    `inferred_decision_id`	integer,
+    `uuid`	varchar ( 100 ),
+    `user_decision_id`	integer,
+    `data_id`	integer NOT NULL,
+    `reason`	varchar ( 100 ),
+    `consumer_id`	integer NOT NULL,
+    `state`	integer,
+    `location`	varchar ( 45 ),
+    `request_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `check_user`	integer,
+    `user_benefit`	varchar ( 45 ),
+    FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY(`consumer_id`) REFERENCES `consumer`(`consumer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY(`user_decision_id`) REFERENCES `user_decision`(`user_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY(`inferred_decision_id`) REFERENCES `inferred_decision`(`inferred_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    );</string>
+    <string name="inferred_decision_attributes"> CREATE TABLE IF NOT EXISTS `inferred_decision_attributes` (
+    `data_attributes_id`	integer NOT NULL,
+    `inferred_decision_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `trust_level`	varchar,
+    `inferred_decision_id`	integer NOT NULL,
+    FOREIGN KEY(`data_attributes_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY(`inferred_decision_id`) REFERENCES `inferred_decision`(`inferred_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    );</string>
+    <string name="inferred_decision"> CREATE TABLE IF NOT EXISTS `inferred_decision` (
+    `inferred_decision_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+    );</string>
+    <string name="data_attributes"> CREATE TABLE IF NOT EXISTS `data_attributes` (
+    `data_id`	integer NOT NULL,
+    `attribute`	varchar ( 45 ),
+    `inferred`	integer,
+    `shared`	integer,
+    `data_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `retention`	varchar ( 45 ),
+    FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    );</string>
+    <string name="data">CREATE TABLE IF NOT EXISTS `data` (
+    `data_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+    );</string>
+    <string name="consumer_attributes">CREATE TABLE IF NOT EXISTS `consumer_attributes` (
+    `attribute`	varchar ( 45 ),
+    `value`	varchar ( 45 ),
+    `consumer_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `consumer_id`	integer NOT NULL,
+    FOREIGN KEY(`consumer_id`) REFERENCES `consumer`(`consumer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    );</string>
+    <string name="consumer"> CREATE TABLE IF NOT EXISTS `consumer` (
+    `consumer_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+    );</string>
+
+
+</resources>
