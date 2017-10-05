@@ -40,43 +40,39 @@ public class Request_Controller {
             request.setLocation(jsonObject.getString("location"));
             request.setReason(jsonObject.getString("reason"));
             request.setUuid(jsonObject.getString("uuid"));
-            request.setDataId(getData(obj));
-            System.out.println();
-            request.setConsumerId(getConsumer(obj));
-
+            request.setDataId(saveData(obj));
+            request.setConsumerId(saveConsumer(obj));
             database.saveRequest(request);
         } catch (JSONException e) {
-            Log.d(TAG, "saveRequest: " + e.getLocalizedMessage());
+            Log.d(TAG, e.getLocalizedMessage());
         }
-
     }
 
-    private Data getData(String obj) {
+    private Data saveData(String obj) {
         try {
             JSONObject jsonObject = new JSONObject(obj);
             JSONArray jsonArray = jsonObject.getJSONArray("data");
-
             Data data = new Data();
             data.setDataId(database.saveData(data));
             List<DataAttributes> dataAttributesList = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 DataAttributes dataAttributes = new DataAttributes();
-                dataAttributes.setDataId(data);
+                dataAttributes.setDataId(data.getDataId());
+                dataAttributes.setAttribute(jsonArray.getJSONObject(i).getString("attribute"));
                 dataAttributes.setRetention(jsonArray.getJSONObject(i).getString("retention"));
                 dataAttributes.setShared((jsonArray.getJSONObject(i).getBoolean("shared")) ? 1 : 0);
                 database.saveDataAttributes(dataAttributes);
                 dataAttributesList.add(dataAttributes);
             }
-
             data.setDataAttributesList(dataAttributesList);
             return data;
         } catch (JSONException e) {
-            Log.d(TAG, "getData: " + e.getLocalizedMessage());
+            Log.d(TAG, e.getLocalizedMessage());
         }
         return null;
     }
 
-    private Consumer getConsumer(String obj) {
+    private Consumer saveConsumer(String obj) {
         try {
             JSONObject jsonObject = new JSONObject(obj);
             JSONArray jsonArray = jsonObject.getJSONArray("consumer");
@@ -86,7 +82,7 @@ public class Request_Controller {
             List<ConsumerAttributes> consumerAttributesList = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 ConsumerAttributes consumerAttributes = new ConsumerAttributes();
-                consumerAttributes.setConsumerId(consumer);
+                consumerAttributes.setConsumerId(consumer.getConsumerId());
                 consumerAttributes.setAttribute(jsonArray.getJSONObject(i).getString("attribute"));
                 consumerAttributes.setValue(jsonArray.getJSONObject(i).getString("value"));
                 database.saveConsumerAttributes(consumerAttributes);
@@ -95,7 +91,7 @@ public class Request_Controller {
             consumer.setConsumerAttributesList(consumerAttributesList);
             return consumer;
         } catch (JSONException e) {
-            Log.d(TAG, "getConsumer" + e.getLocalizedMessage());
+            Log.d(TAG, e.getLocalizedMessage());
         }
         return null;
     }

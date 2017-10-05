@@ -41,9 +41,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Intent it = new Intent(getApplicationContext(), MQTTService.class);
-        startService(it);
-
         if (savedInstanceState == null) {
             Fragment fragment = null;
             Class fragmentClass = null;
