@@ -18,9 +18,18 @@ public class DataAttributes  {
     private Integer shared;
     private String retention;
     private Integer inferred;
-    private Data dataId;
+    private Integer dataId;
+    private String user_benefit;
 
     public DataAttributes() {
+    }
+
+    public String getUser_benefit() {
+        return user_benefit;
+    }
+
+    public void setUser_benefit(String user_benefit) {
+        this.user_benefit = user_benefit;
     }
 
     public DataAttributes(Integer dataAttributesId) {
@@ -67,11 +76,11 @@ public class DataAttributes  {
         this.inferred = inferred;
     }
 
-    public Data getDataId() {
+    public Integer getDataId() {
         return dataId;
     }
 
-    public void setDataId(Data dataId) {
+    public void setDataId(Integer dataId) {
         this.dataId = dataId;
     }
 

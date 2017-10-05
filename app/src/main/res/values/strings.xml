@@ -44,6 +44,7 @@
 
 
     <string name="authentication">aGhrbHRsZ2o6S2lLUnNVRVlQRWRm</string>
+
     <string name="user_decision_attributes"> CREATE TABLE IF NOT EXISTS `user_decision_attributes` (
     `information`	varchar ( 45 ),
     `state`	integer,
@@ -106,6 +107,88 @@
     <string name="consumer"> CREATE TABLE IF NOT EXISTS `consumer` (
     `consumer_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
     );</string>
+    <string name="training_set">
+        CREATE TABLE IF NOT EXISTS `training_set` (
+  `training_set_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `device_type` integer,
+  `data_type` varchar ( 45 ),
+  `user_benefit` varchar ( 45 ),
+  `retention` varchar ( 45 ),
+  `location` varchar ( 45 ),
+  `shared` varchar ( 45 ),
+  `inferred` varchar ( 45 ),
+  `result` varchar ( 45 ));
+    </string>
+    <string name="model_models">CREATE TABLE IF NOT EXISTS `mlp_models` (
+  `mlp_models_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `model` BLOB(1024),
+        `template_header` TEXT);
+    </string>
+
+
+    <string name="conjunto_teste1"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"nome\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste2"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"data_nascimento\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste3"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"email\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste4"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"preferencias_compras\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste5"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"cpf\",\"user_consumer\",\"forever\",\"semi_public\",\"no\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste6"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"agenda\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste7"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"preferencias_musicais\",\"user\",\"forever\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste8"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"dados_bancarios\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"deny\"); </string>
+    <string name="conjunto_teste9"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 2,\"etinerario\",\"user\",\"forever\",\"public\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste10"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 2,\"preferencias_compras\",\"consumer\",\"forever\",\"public\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste11"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 2,\"agenda\",\"consumer\",\"forever\",\"public\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste12"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 3,\"dados_bancarios\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"negotiate\"); </string>
+    <string name="conjunto_teste13"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 3,\"agenda\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste14"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 3,\"preferencias_musicais\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste15"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 3,\"etinerario\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste16"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 4,\"dados_bancarios\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste17"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 4,\"temperatura\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste18"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 4,\"agenda\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste19"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 4,\"preferencias_comida\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"yes\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste20"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 4,\"dados_saude\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste21"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 5,\"consumo_agua\",\"consumer\",\"forever\",\"public\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste22"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 5,\"consumo_energia\",\"consumer\",\"forever\",\"public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste23"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 6,\"consumo_8\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste24"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 6,\"itinerario\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste25"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 7,\"emissao_gas\",\"consumer\",\"forever\",\"public\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste26"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 7,\"renda\",\"consumer\",\"forever\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste27"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 8,\"nome\",\"consumer\",\"forever\",\"your_place\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste28"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 8,\"localizacao\",\"consumer\",\"forever\",\"your_place\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste29"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 8,\"itinerario\",\"consumer\",\"satisfied_purpose\",\"your_place\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste30"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 8,\"agenda\",\"consumer\",\"satisfied_purpose\",\"your_place\",\"no\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste31"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 9,\"localizacao\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"yes\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste32"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 9,\"agenda\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste33"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 10,\"dados_saude\",\"user_consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste34"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 10,\"agenda\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste35"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 11,\"agenda\",\"user\",\"satisfied_purpose\",\"your_place\",\"no\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste36"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 11,\"temperatura\",\"user\",\"satisfied_purpose\",\"your_place\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste37"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 12,\"agenda\",\"user\",\"satisfied_purpose\",\"your_place\",\"no\",\"no\",\"deny\"); </string>
+    <string name="conjunto_teste38"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 13,\"agenda\",\"user\",\"satisfied_purpose\",\"your_place\",\"no\",\"no\",\"negotiate\"); </string>
+    <string name="conjunto_teste39"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 13,\"claridade\",\"user\",\"satisfied_purpose\",\"your_place\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste40"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 15,\"agenda\",\"user_consumer\",\"satisfied_purpose\",\"your_place\",\"no\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste41"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 15,\"localizacao\",\"consumer\",\"satisfied_purpose\",\"your_place\",\"no\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste42"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 4,\"estudante\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste43"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 14,\"modelo_8\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste44"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 14,\"nome\",\"consumer\",\"forever\",\"semi_public\",\"no\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste45"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 16,\"dados_saude\",\"consumer\",\"forever\",\"semi_public\",\"no\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste46"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 16,\"dados_bancarios\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste47"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 17,\"dados_bancarios\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"negotiate\"); </string>
+    <string name="conjunto_teste48"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 17,\"dados_8\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste49"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 18,\"nome\",\"consumer\",\"satisfied_purpose\",\"your_place\",\"yes\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste50"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 18,\"confortavel\",\"consumer\",\"satisfied_purpose\",\"your_place\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste51"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 19,\"historicos\",\"consumer\",\"forever\",\"your_place\",\"yes\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste52"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 20,\"dados_higienico\",\"user\",\"satisfied_purpose\",\"your_place\",\"yes\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste53"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 20,\"agenda\",\"user\",\"satisfied_purpose\",\"your_place\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste54"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 21,\"preferencias_literario\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"yes\",\"deny\"); </string>
+    <string name="conjunto_teste55"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 21,\"dados_bancarios\",\"user_consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"negotiate\"); </string>
+    <string name="conjunto_teste56"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 4,\"preferencias_musicais\",\"user\",\"forever\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste57"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 22,\"preferencias_literario\",\"consumer\",\"forever\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste58"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 22,\"nome\",\"consumer\",\"forever\",\"semi_public\",\"no\",\"yes\",\"negotiate\"); </string>
+    <string name="conjunto_teste59"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 23,\"historicos\",\"user\",\"forever\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste60"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 23,\"preferencias_literario\",\"consumer\",\"forever\",\"semi_public\",\"no\",\"yes\",\"allow\"); </string>
+    <string name="conjunto_teste61"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 23,\"dados_bancarios\",\"user_consumer\",\"forever\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste62"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 23,\"agenda\",\"user\",\"forever\",\"your_place\",\"no\",\"no\",\"allow\"); </string>
+    <string name="conjunto_teste63"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 24,\"cor_da_bosta\",\"consumer\",\"satisfied_purpose\",\"someone_else_place\",\"no\",\"no\",\"deny\"); </string>
 
 
 </resources>

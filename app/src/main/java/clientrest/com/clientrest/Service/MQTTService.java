@@ -42,6 +42,9 @@ public class MQTTService extends Service {
     private static String clientId = "";
     private static Context context;
     private Request_Controller request_controller;
+    private static int TRAIN_MLP = 1;
+    private static int SAVE_NEW_REQUEST = 2;
+    private static int PROCESSING_REQUESTS = 3;
     MemoryPersistence persistence;
     MqttClient mqttClient;
 
@@ -51,7 +54,6 @@ public class MQTTService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("MQTTService", "onCreate");
         context = getApplicationContext();
         subscribe();
         request_controller = new Request_Controller(context);
@@ -66,14 +68,21 @@ public class MQTTService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("MQTTService", "onStartCommand");
         if (intent != null && intent.getExtras() != null) {
-            String request = intent.getExtras().getString("request");
-            if (request != null) {
-                new ProcessRequest().execute(request);
+            int codeId = intent.getExtras().getInt("CODE");
+            if (codeId == TRAIN_MLP) {
+                new Training_MultilayerPerceptron().execute();
+            } else {
+                if (codeId == SAVE_NEW_REQUEST) {
+                    new SaveRequest().execute(intent.getExtras().getString("request"));
+                } else {
+                    if (codeId == PROCESSING_REQUESTS) {
+                        new ProcessRequest(context);
+                    }
+                }
             }
-        }
 
+        }
         return (super.onStartCommand(intent, flags, startId));
     }
 
@@ -86,6 +95,7 @@ public class MQTTService extends Service {
                     Log.i("MQTTService", "messageArrived");
                     Intent it = new Intent(context, MQTTService.class);
                     Bundle mBundle = new Bundle();
+                    mBundle.putInt("CODE", SAVE_NEW_REQUEST);
                     mBundle.putString("request", msg.toString());
                     it.putExtras(mBundle);
                     startService(it);
@@ -162,7 +172,6 @@ public class MQTTService extends Service {
         }
     }
 
-
     private void showNotification() {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_notifications_black_18dp) // notification icon
@@ -176,17 +185,29 @@ public class MQTTService extends Service {
         mNotificationManager.notify(0, mBuilder.getNotification());
     }
 
-    class ProcessRequest extends AsyncTask<String, Void, Boolean> {
+    private class SaveRequest extends AsyncTask<String, Void, Boolean> {
         protected Boolean doInBackground(String... param) {
             boolean ret = false;
             if (!CheckRequest(param[0])) {
                 GenerateReturnPort(param[0]);
                 request_controller.saveRequest(param[0]);
-            }else{
+                Intent it = new Intent(context, MQTTService.class);
+                Bundle mBundle = new Bundle();
+                mBundle.putInt("CODE", PROCESSING_REQUESTS);
+                it.putExtras(mBundle);
+                startService(it);
+            } else {
                 Log.i("MQTTService", "request Existe");
             }
             showNotification();
             return ret;
+        }
+    }
+
+    private class Training_MultilayerPerceptron extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(String... param) {
+            new MLP(context);
+            return null;
         }
     }
 
@@ -196,11 +217,9 @@ public class MQTTService extends Service {
             String request_id = jsonObject.getString("request_id");
             return true;
         } catch (JSONException e) {
-            Log.i("MQTTService", "requestJson ERROR:" + e.toString());
+            return false;
         }
-        return false;
     }
-
 
     @Override
     public void onDestroy() {

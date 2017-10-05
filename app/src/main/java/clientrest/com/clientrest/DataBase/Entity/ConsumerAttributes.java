@@ -16,7 +16,7 @@ public class ConsumerAttributes  {
     private Integer consumerAttributesId;
     private String attribute;
     private String value;
-    private Consumer consumerId;
+    private Integer consumerId;
 
     public ConsumerAttributes() {
     }
@@ -49,11 +49,11 @@ public class ConsumerAttributes  {
         this.value = value;
     }
 
-    public Consumer getConsumerId() {
+    public Integer getConsumerId() {
         return consumerId;
     }
 
-    public void setConsumerId(Consumer consumerId) {
+    public void setConsumerId(Integer consumerId) {
         this.consumerId = consumerId;
     }
 

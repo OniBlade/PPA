@@ -26,6 +26,7 @@ public class Request {
 
     public Request() {
         this.state = 0; //false
+        this.checkUser = 0;//false;
     }
 
     public Request(Integer requestId) {
@@ -54,6 +55,14 @@ public class Request {
 
     public void setCheckUser(Integer checkUser) {
         this.checkUser = checkUser;
+    }
+
+    public void setCheckUser(boolean checkUser) {
+        if (checkUser) {
+            this.checkUser = 1;
+        } else {
+            this.checkUser = 0;
+        }
     }
 
     public Integer getState() {

@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.Service.MQTTService;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -17,6 +18,9 @@ public class SplashActivity extends AppCompatActivity {
 
     private final int SPLASH_DISPLAY_LENGTH = 1000;
     private DBHelper mydb;
+    private static int TRAIN_MLP = 1;
+    private static int SAVE_NEW_REQUEST = 2;
+    private static int PROCESSING_REQUESTS = 3;
 
 
     /**
@@ -27,15 +31,17 @@ public class SplashActivity extends AppCompatActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.background_splash);
-
-        /* New Handler to start the Menu-Activity
-         * and close this Splash-Screen after some seconds.*/
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                /* Create an Intent that will start the Menu-Activity. */
                 mydb = new DBHelper(getApplicationContext());
                 mydb.getWritableDatabase();
+
+                Intent it = new Intent(getApplicationContext(), MQTTService.class);
+                Bundle mBundle = new Bundle();
+                mBundle.putInt("CODE",PROCESSING_REQUESTS);
+                it.putExtras(mBundle);
+                startService(it);
 
                 Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
                 SplashActivity.this.startActivity(mainIntent);
