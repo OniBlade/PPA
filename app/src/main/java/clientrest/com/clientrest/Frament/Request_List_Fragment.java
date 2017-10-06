@@ -1,7 +1,6 @@
 package clientrest.com.clientrest.Frament;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,18 +8,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-
-import org.bson.Document;
-
-import clientrest.com.clientrest.Adapter.NotificationRecyclerViewAdapter;
+import android.view.ViewGroup;import clientrest.com.clientrest.Adapter.Request_RecyclerViewAdapter;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Request;
-import clientrest.com.clientrest.DatabaseDAO;
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.dummy.DummyContent.DummyItem;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +21,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class NotificationFragment_item extends Fragment {
+public class Request_List_Fragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -41,13 +33,13 @@ public class NotificationFragment_item extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public NotificationFragment_item() {
+    public Request_List_Fragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static NotificationFragment_item newInstance(int columnCount) {
-        NotificationFragment_item fragment = new NotificationFragment_item();
+    public static Request_List_Fragment newInstance(int columnCount) {
+        Request_List_Fragment fragment = new Request_List_Fragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -66,7 +58,7 @@ public class NotificationFragment_item extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_notification_list, container, false);
+        View view = inflater.inflate(R.layout.request_items_fragment, container, false);
 
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -76,7 +68,7 @@ public class NotificationFragment_item extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new NotificationRecyclerViewAdapter(getDataSet(), mListener));
+            recyclerView.setAdapter(new Request_RecyclerViewAdapter(getDataSet(), mListener));
         }
         return view;
     }

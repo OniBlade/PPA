@@ -6,17 +6,14 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Consumer;
 import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Data;
 import clientrest.com.clientrest.DataBase.Entity.DataAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
-import clientrest.com.clientrest.R;
 
 /**
  * Created by Fagner Roger on 02/10/2017.

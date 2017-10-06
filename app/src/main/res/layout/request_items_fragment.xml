@@ -9,5 +9,5 @@
     android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="clientrest.com.clientrest.Frament.NotificationFragment_item"
-    tools:listitem="@layout/fragment_notification" />
+    tools:context="clientrest.com.clientrest.Frament.Request_List_Fragment"
+    tools:listitem="@layout/request_items_list" />

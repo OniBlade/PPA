@@ -13,19 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.bson.Document;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.List;
 
 import clientrest.com.clientrest.Activity.MainActivity;
-import clientrest.com.clientrest.Adapter.MyDadosRecyclerViewAdapter;
+import clientrest.com.clientrest.Adapter.Request_Items_RecyclerViewAdapter;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
-import clientrest.com.clientrest.DatabaseDAO;
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.dummy.DummyContent;
 
@@ -33,12 +27,12 @@ import clientrest.com.clientrest.dummy.DummyContent;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link BlankFragment.OnListFragmentInteractionListener} interface
+ * {@link Request_Fragment.OnListFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link BlankFragment#newInstance} factory method to
+ * Use the {@link Request_Fragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BlankFragment extends Fragment {
+public class Request_Fragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -53,14 +47,14 @@ public class BlankFragment extends Fragment {
     private DBHelper database;
     private Button btn_Concluir;
     private CardView cvConsumidor, cvDados, cvmotivo;
-    private TextView tvDescription_Solicitante, tvDescription_Motivo,tvRequesting_Number;
+    private TextView tvDescription_Solicitante, tvDescription_Motivo, tvRequesting_Number;
     private View vSeparador, vSeparadorMotivo;
     private ImageView item_img_consumer, item_img_motivo, item_img_dados;
     private RecyclerView recyclerView;
     private OnListFragmentInteractionListener mListener;
-    private NotificationFragment_item.OnListFragmentInteractionListener mListener2;
+    private Request_List_Fragment.OnListFragmentInteractionListener mListener2;
 
-    public BlankFragment() {
+    public Request_Fragment() {
         // Required empty public constructor
     }
 
@@ -70,11 +64,11 @@ public class BlankFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment BlankFragment.
+     * @return A new instance of fragment Request_Fragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BlankFragment newInstance(String param1, String param2) {
-        BlankFragment fragment = new BlankFragment();
+    public static Request_Fragment newInstance(String param1, String param2) {
+        Request_Fragment fragment = new Request_Fragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -92,31 +86,31 @@ public class BlankFragment extends Fragment {
     }
 
     private void instantiateComponents(View view) {
-        btn_Concluir = (Button) view.findViewById(R.id.btn_Concluir);
-        tvRequesting_Number  = view.findViewById(R.id.tvRequesting_Number);
-        cvConsumidor = (CardView) view.findViewById(R.id.cvConsumidor);
-        cvDados = (CardView) view.findViewById(R.id.cvDados);
-        cvmotivo = (CardView) view.findViewById(R.id.cvMotivo);
-        tvDescription_Solicitante = (TextView) view.findViewById(R.id.tvDescription_Solicitante);
-        tvDescription_Motivo = (TextView) view.findViewById(R.id.tvDescription_Motivo);
-        vSeparador = (View) view.findViewById(R.id.vSeparador);
-        vSeparadorMotivo = (View) view.findViewById(R.id.vSeparadorMotivo);
-        item_img_consumer = (ImageView) view.findViewById(R.id.item_img_consumer);
-        item_img_motivo = (ImageView) view.findViewById(R.id.item_img_motivo);
-        item_img_dados = (ImageView) view.findViewById(R.id.item_img_dados);
-        recyclerView = (RecyclerView) view.findViewById(R.id.RecyclerViewlist);
+        btn_Concluir = view.findViewById(R.id.btn_Concluir);
+        tvRequesting_Number = view.findViewById(R.id.tvRequesting_Number);
+        cvConsumidor = view.findViewById(R.id.cvConsumidor);
+        cvDados = view.findViewById(R.id.cvDados);
+        cvmotivo = view.findViewById(R.id.cvMotivo);
+        tvDescription_Solicitante = view.findViewById(R.id.tvDescription_Solicitante);
+        tvDescription_Motivo = view.findViewById(R.id.tvDescription_Motivo);
+        vSeparador = view.findViewById(R.id.vSeparador);
+        vSeparadorMotivo = view.findViewById(R.id.vSeparadorMotivo);
+        item_img_consumer = view.findViewById(R.id.item_img_consumer);
+        item_img_motivo = view.findViewById(R.id.item_img_motivo);
+        item_img_dados = view.findViewById(R.id.item_img_dados);
+        recyclerView = view.findViewById(R.id.RecyclerViewlist);
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        final View view = inflater.inflate(R.layout.fragment_blank, container, false);
+        final View view = inflater.inflate(R.layout.request_fragment, container, false);
         context = view.getContext();
         instantiateComponents(view);
 
         tvRequesting_Number.setText(request.getRequestId().toString());
-        recyclerView.setAdapter(new MyDadosRecyclerViewAdapter(request, view.getContext()));
+        recyclerView.setAdapter(new Request_Items_RecyclerViewAdapter(request, view.getContext()));
 
         item_img_dados.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
         recyclerView.setVisibility(View.VISIBLE);
@@ -185,10 +179,26 @@ public class BlankFragment extends Fragment {
     }
 
     private void FinalizeRequest() {
+        DBHelper database = new DBHelper(context);
+        database.updateRequestStatus(request, true);
     }
 
     private boolean checkAllAttributes() {
-        return false;
+        updateRequest();
+        boolean flag = false;
+        if (request.getUserDecisionId().getUserDecisionId() != 0) {
+            if (request.getUserDecisionId().getUserDecisionAttributesList().size() == request.getDataId().getDataAttributesList().size()) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        }
+        return flag;
+    }
+
+    private void updateRequest() {
+        DBHelper database = new DBHelper(context);
+        request = database.getRequest(request.getRequestId());
     }
 
     private String getConsumerAttributes(List<ConsumerAttributes> consumerAttributesList) {
@@ -201,7 +211,7 @@ public class BlankFragment extends Fragment {
 
 
     private void fragmentJump() {
-        NotificationFragment_item mFragment = new NotificationFragment_item();
+        Request_List_Fragment mFragment = new Request_List_Fragment();
         Bundle mBundle = new Bundle();
         mFragment.setArguments(mBundle);
         switchContent(R.id.content_main, mFragment);

@@ -154,4 +154,7 @@ public class Request {
         return "clientrest.entity.Request[ requestId=" + requestId + " ]";
     }
 
+    public void setState(boolean status) {
+        this.state= (status)? 1:0;
+    }
 }
