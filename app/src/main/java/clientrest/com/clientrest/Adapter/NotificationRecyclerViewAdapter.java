@@ -9,11 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.bson.Document;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import clientrest.com.clientrest.Activity.MainActivity;
+import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.Frament.BlankFragment;
 import clientrest.com.clientrest.Frament.NotificationFragment_item.OnListFragmentInteractionListener;
 import clientrest.com.clientrest.R;
@@ -28,11 +25,11 @@ import java.util.List;
  */
 public class NotificationRecyclerViewAdapter extends RecyclerView.Adapter<NotificationRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Document> mValues;
+    private final List<Request> mValues;
     private final OnListFragmentInteractionListener mListener;
     private Context context;
 
-    public NotificationRecyclerViewAdapter(List<Document> items, OnListFragmentInteractionListener listener) {
+    public NotificationRecyclerViewAdapter(List<Request> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -46,77 +43,30 @@ public class NotificationRecyclerViewAdapter extends RecyclerView.Adapter<Notifi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        JSONObject jsonObject = null;
-        try {
-            holder.tvPedido.setText("N° Pedido:");
-            jsonObject = new JSONObject(mValues.get(position).toJson());
-            holder.tvNumPedido.setText(getNumeroPedido(jsonObject));
-            holder.tvSolicitante.setText(getSolicitante(jsonObject,0));
-            holder.tvMotivo.setText(getMotivo(jsonObject));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+        holder.tvPedido.setText("N° Pedido:");
+        holder.tvNumPedido.setText(mValues.get(position).getRequestId().toString());
+        holder.tvSolicitante.setText((mValues.get(position).getConsumerId().getConsumerAttributesList().get(0).getValue()));
+        holder.tvMotivo.setText(mValues.get(position).getReason());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    mListener.onListFragmentInteraction(holder.mItem);
-                    try {
-                        JSONObject obj = new JSONObject(mValues.get(position).toJson());
-                        fragmentJump(obj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
+                    //  mListener.onListFragmentInteraction(holder.mItem);
+                    fragmentJump(mValues.get(position));
                 }
 
             }
         });
     }
 
-    private String getNumeroPedido(JSONObject jsonObject) {
-        try {
-            JSONObject idObj = jsonObject.getJSONObject("_id");
-            return (String) idObj.get("$oid");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String getSolicitante(JSONObject jsonObject, int cont) {
-        try {
-            String field_atributo , field_valores = "";
-            JSONObject object = new JSONObject(jsonObject.getJSONObject(context.getResources().getString(R.string.objeto_solicitante)).toString());
-            object = object.getJSONObject(context.getResources().getString(R.string.objeto_solicitante_atributo));
-            field_atributo = object.getString(context.getResources().getString(R.string.objeto_field)+cont);
-
-            object = new JSONObject(jsonObject.getJSONObject(context.getResources().getString(R.string.objeto_solicitante)).toString());
-            object = object.getJSONObject(context.getResources().getString(R.string.objeto_solicitante_valores));
-            field_valores = object.getString(context.getResources().getString(R.string.objeto_field)+cont);
-
-            return "Solicitante: "+field_valores;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String getMotivo(JSONObject obj) {
-        try {
-            return "Motivo: " + obj.getString(context.getResources().getString(R.string.objeto_motivo)).toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
 
-    private void fragmentJump(JSONObject obj) {
+    private void fragmentJump(Request request) {
         BlankFragment mFragment = new BlankFragment();
         Bundle mBundle = new Bundle();
-        mBundle.putString("response", obj.toString());
+        mBundle.putInt("response", request.getRequestId());
         mFragment.setArguments(mBundle);
         switchContent(R.id.content_main, mFragment);
     }

@@ -6,6 +6,8 @@
 package clientrest.com.clientrest.DataBase.Entity;
 
 
+import java.util.List;
+
 /**
  *
  * @author Fagner Roger
@@ -13,8 +15,10 @@ package clientrest.com.clientrest.DataBase.Entity;
 public class InferredDecision  {
 
     private static final long serialVersionUID = 1L;
-     private Integer inferredDecisionId;
-    
+    private Integer inferredDecisionId;
+    private List<InferredDecisionAttributes> inferredDecisionAttributesList;
+
+
     public InferredDecision() {
     }
 
@@ -30,7 +34,14 @@ public class InferredDecision  {
         this.inferredDecisionId = inferredDecisionId;
     }
 
-    
+    public List<InferredDecisionAttributes> getInferredDecisionAttributesList() {
+        return inferredDecisionAttributesList;
+    }
+
+    public void setInferredDecisionAttributesList(List<InferredDecisionAttributes> inferredDecisionAttributesList) {
+        this.inferredDecisionAttributesList = inferredDecisionAttributesList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

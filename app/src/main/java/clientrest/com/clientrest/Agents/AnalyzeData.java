@@ -6,5 +6,5 @@ package clientrest.com.clientrest.Agents;
 
 public class AnalyzeData {
     public AnalyzeData(){}
-    public boolean thisDataExists(String data2){return true;} 
+    public boolean thisDataExists(String data2){return true;}
 }

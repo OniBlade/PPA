@@ -37,6 +37,13 @@ public class SplashActivity extends AppCompatActivity {
                 mydb = new DBHelper(getApplicationContext());
                 mydb.getWritableDatabase();
 
+                Intent it2 = new Intent(getApplicationContext(), MQTTService.class);
+                Bundle mBundle2 = new Bundle();
+                mBundle2.putInt("CODE",TRAIN_MLP);
+                it2.putExtras(mBundle2);
+                startService(it2);
+
+
                 Intent it = new Intent(getApplicationContext(), MQTTService.class);
                 Bundle mBundle = new Bundle();
                 mBundle.putInt("CODE",PROCESSING_REQUESTS);

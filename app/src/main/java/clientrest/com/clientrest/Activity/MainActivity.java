@@ -135,19 +135,6 @@ public class MainActivity extends AppCompatActivity
         Boolean swap = true;
         Fragment fragment = null;
         Class fragmentClass = null;
-
-        Parcelable parcelable = new Parcelable() {
-            @Override
-            public int describeContents() {
-                return 0;
-            }
-
-            @Override
-            public void writeToParcel(Parcel parcel, int i) {
-
-            }
-        };
-
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {

@@ -59,7 +59,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/textView5"
+                            android:id="@+id/tvRequesting_Number"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingBottom="3dp"

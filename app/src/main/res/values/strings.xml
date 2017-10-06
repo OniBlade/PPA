@@ -50,9 +50,9 @@
     `state`	integer,
     `user_decision_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `user_decision_id`	integer NOT NULL,
-    `data_atttribute_id`	integer NOT NULL,
+    `data_attribute_id`	integer NOT NULL,
     FOREIGN KEY(`user_decision_id`) REFERENCES `user_decision`(`user_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    FOREIGN KEY(`data_atttribute_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    FOREIGN KEY(`data_attribute_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>
     <string name="user_decision">CREATE TABLE IF NOT EXISTS `user_decision` (
     `user_decision_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT

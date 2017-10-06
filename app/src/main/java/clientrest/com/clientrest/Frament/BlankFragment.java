@@ -18,8 +18,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import clientrest.com.clientrest.Activity.MainActivity;
 import clientrest.com.clientrest.Adapter.MyDadosRecyclerViewAdapter;
+import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
+import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.DatabaseDAO;
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.dummy.DummyContent;
@@ -43,8 +48,15 @@ public class BlankFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    Context context;
-    private JSONObject jsonObject;
+    private Context context;
+    private Request request;
+    private DBHelper database;
+    private Button btn_Concluir;
+    private CardView cvConsumidor, cvDados, cvmotivo;
+    private TextView tvDescription_Solicitante, tvDescription_Motivo,tvRequesting_Number;
+    private View vSeparador, vSeparadorMotivo;
+    private ImageView item_img_consumer, item_img_motivo, item_img_dados;
+    private RecyclerView recyclerView;
     private OnListFragmentInteractionListener mListener;
     private NotificationFragment_item.OnListFragmentInteractionListener mListener2;
 
@@ -73,37 +85,38 @@ public class BlankFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        database = new DBHelper(getContext());
         if (getArguments() != null) {
-            try {
-                jsonObject = new JSONObject(getArguments().getString("response"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            request = database.getRequest(getArguments().getInt("response"));
         }
     }
+
+    private void instantiateComponents(View view) {
+        btn_Concluir = (Button) view.findViewById(R.id.btn_Concluir);
+        tvRequesting_Number  = view.findViewById(R.id.tvRequesting_Number);
+        cvConsumidor = (CardView) view.findViewById(R.id.cvConsumidor);
+        cvDados = (CardView) view.findViewById(R.id.cvDados);
+        cvmotivo = (CardView) view.findViewById(R.id.cvMotivo);
+        tvDescription_Solicitante = (TextView) view.findViewById(R.id.tvDescription_Solicitante);
+        tvDescription_Motivo = (TextView) view.findViewById(R.id.tvDescription_Motivo);
+        vSeparador = (View) view.findViewById(R.id.vSeparador);
+        vSeparadorMotivo = (View) view.findViewById(R.id.vSeparadorMotivo);
+        item_img_consumer = (ImageView) view.findViewById(R.id.item_img_consumer);
+        item_img_motivo = (ImageView) view.findViewById(R.id.item_img_motivo);
+        item_img_dados = (ImageView) view.findViewById(R.id.item_img_dados);
+        recyclerView = (RecyclerView) view.findViewById(R.id.RecyclerViewlist);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         final View view = inflater.inflate(R.layout.fragment_blank, container, false);
         context = view.getContext();
+        instantiateComponents(view);
 
-        Button btn_Concluir = (Button) view.findViewById(R.id.btn_Concluir);
-
-        CardView cvConsumidor = (CardView) view.findViewById(R.id.cvConsumidor);
-        CardView cvDados = (CardView) view.findViewById(R.id.cvDados);
-        CardView cvmotivo = (CardView) view.findViewById(R.id.cvMotivo);
-
-        final TextView tvDescription_Solicitante = (TextView) view.findViewById(R.id.tvDescription_Solicitante);
-        final TextView tvDescription_Motivo = (TextView) view.findViewById(R.id.tvDescription_Motivo);
-        final View vSeparador = (View) view.findViewById(R.id.vSeparador);
-        final View vSeparadorMotivo = (View) view.findViewById(R.id.vSeparadorMotivo);
-        final ImageView item_img_consumer = (ImageView) view.findViewById(R.id.item_img_consumer);
-        final ImageView item_img_motivo = (ImageView) view.findViewById(R.id.item_img_motivo);
-        final ImageView item_img_dados = (ImageView) view.findViewById(R.id.item_img_dados);
-
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.RecyclerViewlist);
-        recyclerView.setAdapter(new MyDadosRecyclerViewAdapter(jsonObject, view.getContext()));
+        tvRequesting_Number.setText(request.getRequestId().toString());
+        recyclerView.setAdapter(new MyDadosRecyclerViewAdapter(request, view.getContext()));
 
         item_img_dados.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
         recyclerView.setVisibility(View.VISIBLE);
@@ -111,12 +124,12 @@ public class BlankFragment extends Fragment {
         btn_Concluir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (VerificarConclusaoSolicitacao()) {
-                    FinalizarConclusao();
+                if (checkAllAttributes()) {
+                    FinalizeRequest();
                     Toast.makeText(context, "Finalizado com sucesso!!!", Toast.LENGTH_LONG).show();
                     fragmentJump();
                 } else {
-                    Toast.makeText(context,"É necesario responder todos os dados solicitados",Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "É necesario responder todos os dados solicitados", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -125,7 +138,7 @@ public class BlankFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                tvDescription_Solicitante.setText(getSolicitante(jsonObject));
+                tvDescription_Solicitante.setText(getConsumerAttributes(request.getConsumerId().getConsumerAttributesList()));
 
                 if (tvDescription_Solicitante.getVisibility() == View.GONE) {
                     item_img_consumer.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
@@ -142,7 +155,7 @@ public class BlankFragment extends Fragment {
         cvmotivo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tvDescription_Motivo.setText(getMotivo(jsonObject));
+                tvDescription_Motivo.setText(request.getReason());
                 if (tvDescription_Motivo.getVisibility() == View.GONE) {
                     item_img_motivo.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
                     tvDescription_Motivo.setVisibility(View.VISIBLE);
@@ -171,10 +184,21 @@ public class BlankFragment extends Fragment {
         return view;
     }
 
-    private void FinalizarConclusao() {
-        DatabaseDAO data = new DatabaseDAO(context);
-        data.FinalizarNotificao(false, jsonObject);
+    private void FinalizeRequest() {
     }
+
+    private boolean checkAllAttributes() {
+        return false;
+    }
+
+    private String getConsumerAttributes(List<ConsumerAttributes> consumerAttributesList) {
+        String string_return = "";
+        for (int i = 0; i < consumerAttributesList.size(); i++) {
+            string_return += consumerAttributesList.get(i).getAttribute() + ": " + consumerAttributesList.get(i).getValue() + "\n";
+        }
+        return string_return;
+    }
+
 
     private void fragmentJump() {
         NotificationFragment_item mFragment = new NotificationFragment_item();
@@ -191,78 +215,6 @@ public class BlankFragment extends Fragment {
             mainActivity.switchContent(id, fragment, "NotificationFrament");
         }
     }
-
-    private boolean VerificarConclusaoSolicitacao() {
-        boolean flag = false;
-        DatabaseDAO dataBase = new DatabaseDAO(context);
-        Document doc = dataBase.findID(context.getResources().getString(R.string.collection), getNumeroPedido(jsonObject));
-        try {
-            jsonObject = new JSONObject(doc.toJson());
-            JSONObject objGenerico = jsonObject.getJSONObject(context.getResources().getString(R.string.objeto_decisao_usuario));
-            JSONArray arrayAtributoUsuario = objGenerico.getJSONArray(context.getResources().getString(R.string.objeto_decisao_usuario_atributo));
-
-            objGenerico = jsonObject.getJSONObject(context.getResources().getString(R.string.objeto_decisao_inferida));
-            JSONArray arratAtributoInferencia = objGenerico.getJSONArray(context.getResources().getString(R.string.objeto_decisao_inferida_atributo));
-
-            if (arrayAtributoUsuario.length() == arratAtributoInferencia.length()) {
-                flag = true;
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return flag;
-    }
-
-
-    private String getNumeroPedido(JSONObject jsonObject) {
-        try {
-            JSONObject idObj = jsonObject.getJSONObject("_id");
-            return (String) idObj.get("$oid");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String getSolicitante(JSONObject jsonObject) {
-        try {
-            String field_atributo, field_valores, field_return = "";
-            int cont = 0;
-
-            JSONObject objectAtributo = new JSONObject(jsonObject.getJSONObject(context.getResources().getString(R.string.objeto_solicitante)).toString());
-            objectAtributo = objectAtributo.getJSONObject(context.getResources().getString(R.string.objeto_solicitante_atributo));
-
-            JSONObject objectValores = new JSONObject(jsonObject.getJSONObject(context.getResources().getString(R.string.objeto_solicitante)).toString());
-            objectValores = objectValores.getJSONObject(context.getResources().getString(R.string.objeto_solicitante_valores));
-            System.out.println(objectAtributo.getString(context.getResources().getString(R.string.objeto_field) + cont));
-
-            try {
-                while (objectAtributo.getString(context.getResources().getString(R.string.objeto_field) + cont) != null) {
-                    field_atributo = objectAtributo.getString(context.getResources().getString(R.string.objeto_field) + cont);
-                    field_valores = objectValores.getString(context.getResources().getString(R.string.objeto_field) + cont);
-                    field_return += field_atributo + ": " + field_valores + "\n";
-                    cont++;
-                }
-            } catch (JSONException e) {
-            }
-
-            return field_return;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String getMotivo(JSONObject obj) {
-        try {
-            return "Motivo: " + obj.getString(context.getResources().getString(R.string.objeto_motivo)).toString() + "\n";
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
     @Override
     public void onAttach(Context context) {

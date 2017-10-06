@@ -4,15 +4,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.OutputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import clientrest.com.clientrest.Agents.AnalyzeData;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
-import weka.classifiers.functions.MultilayerPerceptron;
 
 /**
  * Created by Fagner Roger on 03/10/2017.
@@ -26,6 +23,7 @@ public class ProcessRequest {
 
     public ProcessRequest(Context context) {
         this.context = context;
+        Log.i(TAG, "232");
         new AnalyzeAndProcessRequest().execute();
     }
 
@@ -45,6 +43,7 @@ public class ProcessRequest {
         protected Void doInBackground(String... param) {
             DBHelper database = new DBHelper(getContext());
             boolean flag = false;
+            MLP mlp = null;
             List<Request> requestList = database.getListRequestNotProcessed();
             List<TrainingSet> trainingSetList = database.getListTrainingSeT();
             for (int i = 0; i < requestList.size(); i++) {
@@ -52,16 +51,17 @@ public class ProcessRequest {
                 for (int j = 0; j < requestList.get(i).getDataId().getDataAttributesList().size(); j++) {
                     if (analyzesData.thisDataExists(requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) {
                         if (database.isExistInTrainingSet("data_type", requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) {
-                            MLP mlp = new MLP(context, getTrain_testArff(requestList.get(i), j));
-                            if (database.saveinferred_decision(requestList.get(i), j, mlp.getPrediction())) {
+                            mlp = new MLP(context, getTrain_testArff(requestList.get(i), j));
+                            if (database.saveInferred_Decision(requestList.get(i), j, mlp.getPrediction(), true)) {
                                 flag = true;
                             }
                             Log.i(TAG, "Existe na base de treinamento");
                         } else {
-                            flag = true;
+                            flag = database.saveInferred_Decision(requestList.get(i), j, mlp.getPrediction(), false);
                             Log.i(TAG, "não contem na base de treinamento");
                         }
                     } else {
+                        flag = database.saveInferred_Decision(requestList.get(i), j, mlp.getPrediction(), false);
                         Log.i(TAG, "Dado não contem no banco de dados externo");
                     }
                 }

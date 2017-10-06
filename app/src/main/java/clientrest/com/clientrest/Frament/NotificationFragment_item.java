@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import org.bson.Document;
 
 import clientrest.com.clientrest.Adapter.NotificationRecyclerViewAdapter;
+import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.DatabaseDAO;
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.dummy.DummyContent.DummyItem;
@@ -61,11 +63,6 @@ public class NotificationFragment_item extends Fragment {
         }
     }
 
-    private String getInformacaoHost(Context context) {
-        final SharedPreferences sharedPreferences = context.getSharedPreferences("Conexao", Context.MODE_PRIVATE);
-        return sharedPreferences.getString("Host", "");
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -84,9 +81,9 @@ public class NotificationFragment_item extends Fragment {
         return view;
     }
 
-    private List<Document> getDataSet() {
-        List<Document> results = new ArrayList<Document>();
-        DatabaseDAO dataBase = new DatabaseDAO(getContext());
+    private List<Request> getDataSet() {
+        List<Request> results;
+        DBHelper dataBase = new DBHelper(getContext());
         results = dataBase.getListNotification();
         return results;
     }

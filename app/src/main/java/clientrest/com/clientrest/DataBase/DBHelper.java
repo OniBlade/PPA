@@ -28,9 +28,11 @@ import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Data;
 import clientrest.com.clientrest.DataBase.Entity.DataAttributes;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecision;
+import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
 import clientrest.com.clientrest.DataBase.Entity.UserDecision;
+import clientrest.com.clientrest.DataBase.Entity.UserDecisionAttributes;
 import clientrest.com.clientrest.R;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -272,32 +274,98 @@ public class DBHelper extends SQLiteOpenHelper {
         db.insert("consumer_attributes", null, contentValues);
     }
 
-    public boolean saveinferred_decision(Request request, int j, String[] prediction) {
-        Log.i(TAG, "saveinferred_decision");
+    public void saveUserDecision(Request request, DataAttributes dataAttributes, int decision, String information) {
         SQLiteDatabase db = this.getWritableDatabase();
-        InferredDecision inferredDecision = new InferredDecision();
+        request = getRequest(request.getRequestId());
         ContentValues contentValues = new ContentValues();
-        contentValues.put("inferred_decision_id", (byte[]) null);
-        inferredDecision.setInferredDecisionId((int) db.insert("inferred_decision", null, contentValues));
+        UserDecision userDecision = new UserDecision();
+
+        if (request.getUserDecisionId().getUserDecisionId() == 0) {
+            userDecision = new UserDecision();
+            contentValues.clear();
+            contentValues.put("user_decision_id", (byte[]) null);
+            userDecision.setUserDecisionId((int) db.insert("user_decision", null, contentValues));
+
+            contentValues.clear();
+            if ((!information.isEmpty()) || (decision==2)) {
+                contentValues.put("information", information);
+            }
+            contentValues.put("data_attribute_id", dataAttributes.getDataAttributesId());
+            contentValues.put("state", decision);
+            contentValues.put("user_decision_id", userDecision.getUserDecisionId());
+            db.insert("user_decision_attributes", null, contentValues);
+
+            contentValues.clear();
+            contentValues.put("user_decision_id", userDecision.getUserDecisionId());
+            db.update("request", contentValues, "request_id = ? ", new String[]{Integer.toString(request.getRequestId())});
+
+        } else {
+            userDecision.setUserDecisionId(request.getUserDecisionId().getUserDecisionId());
+            boolean flag = true;
+            for (int i = 0; i < request.getUserDecisionId().getUserDecisionAttributesList().size(); i++) {
+                if (request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getDataAttributesId() == dataAttributes.getDataAttributesId()) {
+                    contentValues.clear();
+                    if ((!information.isEmpty()) || (decision==2)) {
+                        contentValues.put("information", information);
+                    }
+                    flag=false;
+                    contentValues.put("data_attribute_id", dataAttributes.getDataAttributesId());
+                    contentValues.put("state", decision);
+                    contentValues.put("user_decision_id", userDecision.getUserDecisionId());
+                    db.update("user_decision_attributes", contentValues, "user_decision_attributes_id = ? ", new String[]{Integer.toString(request.getUserDecisionId().getUserDecisionAttributesList().get(i).getUserDecisionAttributesId())});
+                }
+            }
+            if(flag){
+                contentValues.clear();
+                if ((!information.isEmpty()) || (decision==2)) {
+                    contentValues.put("information", information);
+                }
+                contentValues.put("data_attribute_id", dataAttributes.getDataAttributesId());
+                contentValues.put("state", decision);
+                contentValues.put("user_decision_id", userDecision.getUserDecisionId());
+                db.insert("user_decision_attributes", null, contentValues);
+            }
+        }
+    }
+
+    public boolean saveInferred_Decision(Request request, int j, String[] prediction, boolean isPrediction) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        InferredDecision inferredDecision = new InferredDecision();
+        if (request.getInferredDecisionId().getInferredDecisionId() == null) {
+            inferredDecision = new InferredDecision();
+            contentValues.clear();
+            contentValues.put("inferred_decision_id", (byte[]) null);
+            inferredDecision.setInferredDecisionId((int) db.insert("inferred_decision", null, contentValues));
+        } else {
+            inferredDecision.setInferredDecisionId(request.getInferredDecisionId().getInferredDecisionId());
+        }
         contentValues.clear();
-        contentValues.put("trust_level", getPercentage(prediction[1]));//trust_level
-        contentValues.put("data_attributes_id", request.getDataId().getDataAttributesList().get(j).getDataId());
+        if (isPrediction) {
+            contentValues.put("trust_level", getPercentage(prediction[1]));//trust_level
+        }
+        contentValues.put("data_attributes_id", request.getDataId().getDataAttributesList().get(j).getDataAttributesId());
         contentValues.put("inferred_decision_id", inferredDecision.getInferredDecisionId());
         db.insert("inferred_decision_attributes", null, contentValues);
 
-        contentValues.clear();
-        contentValues.put("inferred", StringToIntDecision(prediction[0]));
-        db.update("data_attributes", contentValues, "data_attributes_id = ?", new String[]{Integer.toString(request.getDataId().getDataAttributesList().get(j).getDataId())});
-
+        if (isPrediction) {
+            contentValues.clear();
+            contentValues.put("inferred", StringToIntDecision(prediction[0]));
+            db.update("data_attributes", contentValues, "data_attributes_id = ?", new String[]{Integer.toString(request.getDataId().getDataAttributesList().get(j).getDataId())});
+        }
         contentValues.clear();
         request.setInferredDecisionId(inferredDecision);
         contentValues.put("inferred_decision_id", inferredDecision.getInferredDecisionId());
         db.update("request", contentValues, "request_id = ? ", new String[]{Integer.toString(request.getRequestId())});
-        return (getPercentage(prediction[1]) < getUserConfidenceLevel()) ? true : false;
+        if (isPrediction) {
+            return (getPercentage(prediction[1]) < getUserConfidenceLevel()) ? true : false;
+        } else {
+            return true;
+        }
     }
 
     public void updateCheckUserRequest(Request request) {
-        Log.i(TAG, "updateCheckUserRequest");
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         request.setCheckUser(true);
@@ -367,7 +435,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         request.setInferredDecisionId(getInferredDecision(res.getInt(0)));
         request.setUuid(res.getString(1));
-        request.setUserDecisionId(getUSerDecision(res.getInt(2)));
+        request.setUserDecisionId(getUserDecision(res.getInt(2)));
         request.setDataId(getData(res.getInt(3)));
         request.setReason(res.getString(4));
         request.setConsumerId(getConsumer(res.getInt(5)));
@@ -381,11 +449,59 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private InferredDecision getInferredDecision(int id) {
         InferredDecision inferredDecision = new InferredDecision(id);
+        List<InferredDecisionAttributes> inferredDecisionAttributesList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from inferred_decision_attributes where inferred_decision_id=" + id, null);
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            InferredDecisionAttributes inferredDecisionAttributes = new InferredDecisionAttributes();
+            inferredDecisionAttributes.setInferredDecisionId(inferredDecision);
+            inferredDecisionAttributes.setDataAttributes(getDataAttributesForId(res.getInt(0)));
+
+            inferredDecisionAttributes.setTrustLevel(res.getDouble(2));
+            inferredDecisionAttributesList.add(inferredDecisionAttributes);
+            res.moveToNext();
+        }
+        inferredDecision.setInferredDecisionAttributesList(inferredDecisionAttributesList);
         return inferredDecision;
     }
 
-    private UserDecision getUSerDecision(int id) {
+    private DataAttributes getDataAttributesForId(int id) {
+        DataAttributes dataAttributes = new DataAttributes(id);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from data_attributes where data_attributes_id ==" + id, null);
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            dataAttributes.setDataId(res.getInt(0));
+            dataAttributes.setAttribute(res.getString(1));
+            dataAttributes.setInferred(res.getInt(2));
+            dataAttributes.setShared(res.getInt(3));
+            dataAttributes.setDataAttributesId(res.getInt(4));
+            dataAttributes.setRetention(res.getString(5));
+            res.moveToNext();
+        }
+        return dataAttributes;
+    }
+
+    private UserDecision getUserDecision(int id) {
         UserDecision userDecision = new UserDecision(id);
+        List<UserDecisionAttributes> userDecisionAttributesList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from user_decision_attributes where user_decision_id=" + id, null);
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            UserDecisionAttributes userDecisionAttributes = new UserDecisionAttributes();
+            userDecisionAttributes.setInformation(res.getString(0));
+            userDecisionAttributes.setState(res.getInt(1));
+            userDecisionAttributes.setUserDecisionAttributesId(res.getInt(2));
+            userDecisionAttributes.setUserDecisionId(userDecision);
+            userDecisionAttributes.setDataAtttributeId(getDataAttributesForId(res.getInt(4)));
+            userDecisionAttributesList.add(userDecisionAttributes);
+            res.moveToNext();
+        }
+        userDecision.setUserDecisionAttributesList(userDecisionAttributesList);
+        res.close();
+
         return userDecision;
     }
 
@@ -398,7 +514,7 @@ public class DBHelper extends SQLiteOpenHelper {
             Request request = new Request();
             request.setInferredDecisionId(getInferredDecision(res.getInt(0)));
             request.setUuid(res.getString(1));
-            request.setUserDecisionId(getUSerDecision(res.getInt(2)));
+            request.setUserDecisionId(getUserDecision(res.getInt(2)));
             request.setDataId(getData(res.getInt(3)));
             request.setReason(res.getString(4));
             request.setConsumerId(getConsumer(res.getInt(5)));
@@ -445,33 +561,28 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-
-
-       /*public Integer deleteMensagem(Integer id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(MSG_TABLE_NAME,
-                "id = ? ",
-                new String[]{Integer.toString(id)});
-    }*/
-
-    /* public boolean updateMensagem(Integer id, String name, String categoria, Integer favoritos, Integer nEnvios) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        if (name != null)
-            contentValues.put(MSG_COLUMN_NAME, name);
-        if (categoria != null)
-            contentValues.put(MSG_COLUMN_CATEGORY, categoria);
-        if (favoritos != null)
-            contentValues.put(MSG_COLUMN_FAV, favoritos);
-        if (nEnvios != null) {
-            Cursor c = getData(id);
-            c.moveToFirst();
-            contentValues.put(MSG_COLUMN_NENVIOS, c.getInt(5) + nEnvios);
-            c.close();
+    public List<Request> getListNotification() {
+        List<Request> requestList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from request where (state=0 and check_user = 1) ", null);
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            Request request = new Request();
+            request.setInferredDecisionId(getInferredDecision(res.getInt(0)));
+            request.setUuid(res.getString(1));
+            request.setUserDecisionId(getUserDecision(res.getInt(2)));
+            request.setDataId(getData(res.getInt(3)));
+            request.setReason(res.getString(4));
+            request.setConsumerId(getConsumer(res.getInt(5)));
+            request.setState(res.getInt(6));
+            request.setLocation(res.getString(7));
+            request.setRequestId(res.getInt(8));
+            request.setCheckUser(res.getInt(9));
+            request.setUserBenefit(res.getString(10));
+            requestList.add(request);
+            res.moveToNext();
         }
-        db.update(MSG_TABLE_NAME, contentValues, "id = ? ", new String[]{Integer.toString(id)});
-        db.close();
-        return true;
-    }*/
+        return requestList;
+    }
 
 }

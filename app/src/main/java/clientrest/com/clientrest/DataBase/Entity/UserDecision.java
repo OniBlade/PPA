@@ -6,6 +6,8 @@
 package clientrest.com.clientrest.DataBase.Entity;
 
 
+import java.util.List;
+
 /**
  *
  * @author Fagner Roger
@@ -13,8 +15,17 @@ package clientrest.com.clientrest.DataBase.Entity;
 
     private static final long serialVersionUID = 1L;
     private Integer userDecisionId;
+    private List<UserDecisionAttributes> userDecisionAttributesList;
     
     public UserDecision() {
+    }
+
+    public List<UserDecisionAttributes> getUserDecisionAttributesList() {
+        return userDecisionAttributesList;
+    }
+
+    public void setUserDecisionAttributesList(List<UserDecisionAttributes> userDecisionAttributesList) {
+        this.userDecisionAttributesList = userDecisionAttributesList;
     }
 
     public UserDecision(Integer userDecisionId) {
