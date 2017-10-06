@@ -11,22 +11,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import clientrest.com.clientrest.Activity.MainActivity;
-import clientrest.com.clientrest.DatabaseDAO;
 import clientrest.com.clientrest.R;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FragmentConfiguracao.OnFragmentInteractionListener} interface
+ * {@link Configuration_Fragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link FragmentConfiguracao#newInstance} factory method to
+ * Use the {@link Configuration_Fragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentConfiguracao extends Fragment {
+public class Configuration_Fragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -41,7 +39,7 @@ public class FragmentConfiguracao extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public FragmentConfiguracao() {
+    public Configuration_Fragment() {
         // Required empty public constructor
     }
 
@@ -51,11 +49,11 @@ public class FragmentConfiguracao extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentConfiguracao.
+     * @return A new instance of fragment Configuration_Fragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static FragmentConfiguracao newInstance(String param1, String param2) {
-        FragmentConfiguracao fragment = new FragmentConfiguracao();
+    public static Configuration_Fragment newInstance(String param1, String param2) {
+        Configuration_Fragment fragment = new Configuration_Fragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -76,7 +74,7 @@ public class FragmentConfiguracao extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View view = inflater.inflate(R.layout.fragment_configuracao, container, false);
+        final View view = inflater.inflate(R.layout.configuration_fragment, container, false);
         context = view.getContext();
 
         edtHost = (EditText) view.findViewById(R.id.edtHostConf);
@@ -95,14 +93,6 @@ public class FragmentConfiguracao extends Fragment {
                 editor.putString("Host", edtHost.getText().toString());
                 editor.putString("Port", edtPort.getText().toString());
 
-                DatabaseDAO dataBase = new DatabaseDAO(context);
-                if(dataBase.checkConnection(edtHost.getText().toString(),edtPort.getText().toString())){
-                    editor.apply();
-                    Toast.makeText(context, "Salvo com Sucesso!!!", Toast.LENGTH_LONG).show();
-                    fragmentJump();
-                }else{
-                    Toast.makeText(context, "Informaçõs inválidas!!!", Toast.LENGTH_LONG).show();
-                }
             }
         });
 
@@ -110,7 +100,7 @@ public class FragmentConfiguracao extends Fragment {
     }
 
     private void fragmentJump() {
-        NotificationFragment_item mFragment = new NotificationFragment_item();
+        Request_List_Fragment mFragment = new Request_List_Fragment();
         Bundle mBundle = new Bundle();
         mFragment.setArguments(mBundle);
         switchContent(R.id.content_main, mFragment);
@@ -121,7 +111,7 @@ public class FragmentConfiguracao extends Fragment {
             return;
         if (context instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) context;
-            mainActivity.switchContent(id, fragment, "NotificationFragment_item");
+            mainActivity.switchContent(id, fragment, "Request_List_Fragment");
         }
 
     }

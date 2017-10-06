@@ -19,7 +19,7 @@ import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
 
-public class MyDadosRecyclerViewAdapter extends RecyclerView.Adapter<MyDadosRecyclerViewAdapter.DataObjectHolder> {
+public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Items_RecyclerViewAdapter.DataObjectHolder> {
     private Context context;
     private Request request;
     boolean flag_ContemInformacao;
@@ -53,7 +53,7 @@ public class MyDadosRecyclerViewAdapter extends RecyclerView.Adapter<MyDadosRecy
         }
     }
 
-    public MyDadosRecyclerViewAdapter(Request request, Context context) {
+    public Request_Items_RecyclerViewAdapter(Request request, Context context) {
         this.context = context;
         this.request = request;
         mDataset = request.getInferredDecisionId().getInferredDecisionAttributesList();
@@ -61,7 +61,7 @@ public class MyDadosRecyclerViewAdapter extends RecyclerView.Adapter<MyDadosRecy
 
     @Override
     public DataObjectHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_dados, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.data_attributes_fragment, parent, false);
         context = view.getContext();
         DataObjectHolder dataObjectHolder = new DataObjectHolder(view);
         return dataObjectHolder;
@@ -86,7 +86,7 @@ public class MyDadosRecyclerViewAdapter extends RecyclerView.Adapter<MyDadosRecy
             @Override
             public void onClick(View view) {
                 LayoutInflater factory = LayoutInflater.from(view.getContext());
-                final View DialogView = factory.inflate(R.layout.fragment_dados_resposta, null);
+                final View DialogView = factory.inflate(R.layout.data_attribute_response_dialog, null);
                 final AlertDialog Dialog = new AlertDialog.Builder(view.getContext()).create();
                 Dialog.setView(DialogView);
 

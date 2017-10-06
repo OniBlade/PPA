@@ -11,10 +11,9 @@ import android.widget.TextView;
 
 import clientrest.com.clientrest.Activity.MainActivity;
 import clientrest.com.clientrest.DataBase.Entity.Request;
-import clientrest.com.clientrest.Frament.BlankFragment;
-import clientrest.com.clientrest.Frament.NotificationFragment_item.OnListFragmentInteractionListener;
+import clientrest.com.clientrest.Frament.Request_Fragment;
+import clientrest.com.clientrest.Frament.Request_List_Fragment.OnListFragmentInteractionListener;
 import clientrest.com.clientrest.R;
-import clientrest.com.clientrest.dummy.DummyContent.DummyItem;
 
 import java.util.List;
 
@@ -23,20 +22,20 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class NotificationRecyclerViewAdapter extends RecyclerView.Adapter<NotificationRecyclerViewAdapter.ViewHolder> {
+public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_RecyclerViewAdapter.ViewHolder> {
 
     private final List<Request> mValues;
     private final OnListFragmentInteractionListener mListener;
     private Context context;
 
-    public NotificationRecyclerViewAdapter(List<Request> items, OnListFragmentInteractionListener listener) {
+    public Request_RecyclerViewAdapter(List<Request> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_notification, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.request_items_list, parent, false);
         context = view.getContext();
         return new ViewHolder(view);
     }
@@ -61,10 +60,8 @@ public class NotificationRecyclerViewAdapter extends RecyclerView.Adapter<Notifi
         });
     }
 
-
-
     private void fragmentJump(Request request) {
-        BlankFragment mFragment = new BlankFragment();
+        Request_Fragment mFragment = new Request_Fragment();
         Bundle mBundle = new Bundle();
         mBundle.putInt("response", request.getRequestId());
         mFragment.setArguments(mBundle);
@@ -91,16 +88,15 @@ public class NotificationRecyclerViewAdapter extends RecyclerView.Adapter<Notifi
         public final TextView tvPedido;
         public final TextView tvSolicitante;
         public final TextView tvMotivo;
-        public DummyItem mItem;
         public final TextView tvNumPedido;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            tvPedido = (TextView) itemView.findViewById(R.id.tvAtributo);
-            tvSolicitante = (TextView) itemView.findViewById(R.id.tvsolicitante);
-            tvMotivo = (TextView) itemView.findViewById(R.id.tvMotivo);
-            tvNumPedido = (TextView) itemView.findViewById(R.id.tvNumPedido);
+            tvPedido =  itemView.findViewById(R.id.tvAtributo);
+            tvSolicitante =  itemView.findViewById(R.id.tvsolicitante);
+            tvMotivo = itemView.findViewById(R.id.tvMotivo);
+            tvNumPedido = itemView.findViewById(R.id.tvNumPedido);
         }
 
         @Override

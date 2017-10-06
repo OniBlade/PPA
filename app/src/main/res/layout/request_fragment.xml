@@ -315,7 +315,7 @@
                                             android:visibility="visible"
                                             card_view:layoutManager="LinearLayoutManager"
                                             tools:context="clientrest.com.clientrest.Activity.MainActivity"
-                                            tools:listitem="@layout/fragment_dados">
+                                            tools:listitem="@layout/data_attributes_fragment">
 
                                         </android.support.v7.widget.RecyclerView>
 

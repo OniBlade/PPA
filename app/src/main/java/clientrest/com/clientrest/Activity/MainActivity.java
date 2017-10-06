@@ -1,10 +1,7 @@
 package clientrest.com.clientrest.Activity;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,20 +16,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import clientrest.com.clientrest.Frament.BlankFragment;
-import clientrest.com.clientrest.Frament.FragmentConfiguracao;
-import clientrest.com.clientrest.Frament.NotificationFragment_item;
-import clientrest.com.clientrest.Frament.NotificationFrament;
+import clientrest.com.clientrest.Frament.Configuration_Fragment;
+import clientrest.com.clientrest.Frament.Request_Fragment;
+import clientrest.com.clientrest.Frament.Request_List_Fragment;
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.dummy.DummyContent;
-import clientrest.com.clientrest.Service.MQTTService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        NotificationFragment_item.OnListFragmentInteractionListener,
-        NotificationFrament.OnFragmentInteractionListener,
-        BlankFragment.OnListFragmentInteractionListener,
-        FragmentConfiguracao.OnFragmentInteractionListener {
+        Request_List_Fragment.OnListFragmentInteractionListener,
+        Request_Fragment.OnListFragmentInteractionListener,
+        Configuration_Fragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +38,7 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             Fragment fragment = null;
             Class fragmentClass = null;
-            fragmentClass = NotificationFragment_item.class;
+            fragmentClass = Request_List_Fragment.class;
             try {
                 fragment = (Fragment) fragmentClass.newInstance();
 
@@ -63,7 +57,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 Fragment fragment = null;
                 Class fragmentClass;
-                fragmentClass = NotificationFragment_item.class;
+                fragmentClass = Request_List_Fragment.class;
                 try {
                     fragment = (Fragment) fragmentClass.newInstance();
                 } catch (Exception e) {
@@ -110,10 +104,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            FragmentConfiguracao mFragment = new FragmentConfiguracao();
+            Configuration_Fragment mFragment = new Configuration_Fragment();
             Bundle mBundle = new Bundle();
             mFragment.setArguments(mBundle);
-            switchContent(R.id.content_main, mFragment,"FragmentConfiguracao");
+            switchContent(R.id.content_main, mFragment,"Configuration_Fragment");
 
             return true;
         }else{
@@ -141,11 +135,11 @@ public class MainActivity extends AppCompatActivity
             swap = false;
         } else if (id == R.id.nav_gallery) {
             TAG = "Notification_Main";
-            fragmentClass = NotificationFragment_item.class;
+            fragmentClass = Request_List_Fragment.class;
             mBundle.putInt("column-count", 0);
         } else if (id == R.id.nav_slideshow) {
-            TAG ="FragmentConfiguracao";
-            fragmentClass = FragmentConfiguracao.class;
+            TAG ="Configuration_Fragment";
+            fragmentClass = Configuration_Fragment.class;
 
         } else if (id == R.id.nav_manage) {
             swap = false;

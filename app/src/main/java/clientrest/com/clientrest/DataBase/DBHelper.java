@@ -585,4 +585,12 @@ public class DBHelper extends SQLiteOpenHelper {
         return requestList;
     }
 
+    public void updateRequestStatus(Request request, boolean state) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        request.setState(state);
+        contentValues.put("state", request.getState());
+        db.update("request", contentValues, "request_id = ? ", new String[]{Integer.toString(request.getRequestId())});
+
+    }
 }
