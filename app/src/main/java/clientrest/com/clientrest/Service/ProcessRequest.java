@@ -23,7 +23,6 @@ public class ProcessRequest {
 
     public ProcessRequest(Context context) {
         this.context = context;
-        Log.i(TAG, "232");
         new AnalyzeAndProcessRequest().execute();
     }
 
@@ -48,9 +47,9 @@ public class ProcessRequest {
             List<TrainingSet> trainingSetList = database.getListTrainingSeT();
             for (int i = 0; i < requestList.size(); i++) {
                 AnalyzeData analyzesData = new AnalyzeData();
-                for (int j = 0; j < requestList.get(i).getDataId().getDataAttributesList().size(); j++) {
-                    if (analyzesData.thisDataExists(requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) {
-                        if (database.isExistInTrainingSet("data_type", requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) {
+                for (int j = 0; j < requestList.get(i).getDataId().getDataAttributesList().size(); j++) { //todos atributos
+                    if (analyzesData.thisDataExists(requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) { //verifica se existe no banco de dados
+                        if (database.isExistInTrainingSet("data_type", requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) { //verifica se existe na base de treinamento
                             mlp = new MLP(context, getTrain_testArff(requestList.get(i), j));
                             if (database.saveInferred_Decision(requestList.get(i), j, mlp.getPrediction(), true)) {
                                 flag = true;
@@ -66,9 +65,14 @@ public class ProcessRequest {
                     }
                 }
                 if (flag) {
+                    Log.i(TAG, "updateCheckUserRequest");
                     database.updateCheckUserRequest(requestList.get(i));
-                    flag = false;
+                }else{
+                    Log.i(TAG, "não precisa prever");
+                    Log.i(TAG, "getCheckUser"+requestList.get(i).getCheckUser());
+                    database.updateRequestStatus(requestList.get(i),true);
                 }
+                flag = false;
             }
             return null;
         }
@@ -93,11 +97,7 @@ public class ProcessRequest {
     }
 
     private String getStringParam(int shared) {
-        if (shared == 0) {
-            return "no";
-        } else {
-            return "yes";
-        }
+        return  (shared == 0)?"no":"yes";
     }
 
 

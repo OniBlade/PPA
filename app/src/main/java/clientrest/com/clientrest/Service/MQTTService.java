@@ -143,11 +143,11 @@ public class MQTTService extends Service {
     }
 
     private void CreateACLByUser(String str) {
+        HttpURLConnection con = null;
         try {
             String stringUrl = "http://api.cloudmqtt.com/acl";
-
             URL myurl = new URL(stringUrl);
-            HttpURLConnection con = (HttpURLConnection) myurl.openConnection();
+            con = (HttpURLConnection) myurl.openConnection();
             con.setDoOutput(true);
             con.setDoInput(true);
 
@@ -159,7 +159,6 @@ public class MQTTService extends Service {
             os.write(str.getBytes());
             os.close();
 
-            StringBuilder sb = new StringBuilder();
             int HttpResult = con.getResponseCode();
             if (HttpResult == 204) {
                 Log.i("MQTTService", "Porta criado com sucesso!");
@@ -169,6 +168,8 @@ public class MQTTService extends Service {
             }
         } catch (IOException ex) {
             Log.i("MQTTService", "HttpURLConnection ERROR:" + ex.toString());
+        } finally {
+            con.disconnect();
         }
     }
 
@@ -197,7 +198,7 @@ public class MQTTService extends Service {
                 it.putExtras(mBundle);
                 startService(it);
             } else {
-                Log.i("MQTTService", "request Existe");
+                Log.i("MQTTService", "request Existe");//fazer quando ele ja existe
             }
             showNotification();
             return ret;

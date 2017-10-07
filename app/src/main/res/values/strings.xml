@@ -79,6 +79,7 @@
     `inferred_decision_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `trust_level`	varchar,
     `inferred_decision_id`	integer NOT NULL,
+     `state` integer,
     FOREIGN KEY(`data_attributes_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`inferred_decision_id`) REFERENCES `inferred_decision`(`inferred_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>

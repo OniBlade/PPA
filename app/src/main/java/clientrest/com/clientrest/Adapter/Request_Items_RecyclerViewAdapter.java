@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +12,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.List;
-
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
@@ -27,10 +26,9 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
     private List<InferredDecisionAttributes> mDataset;
     private static MyClickListener myClickListener;
     private TextView tvAtributoResp, tvRespostaResp, tvNivelResp, tvInserirResp;
-    private static final String ALLOW = "allow";
-    private static final String DENY = "deny";
-    private static final String NEGOTIATE = "negotiate";
-
+    private static final String ALLOW = "Permitir";
+    private static final String DENY = "Negar";
+    private static final String NEGOTIATE = "Negociar";
 
     public static class DataObjectHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvAtributo;
@@ -40,10 +38,10 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
 
         public DataObjectHolder(View itemView) {
             super(itemView);
-            tvAtributo = (TextView) itemView.findViewById(R.id.tvAtributo);
-            tvResposta = (TextView) itemView.findViewById(R.id.tvResposta);
-            tvNivel = (TextView) itemView.findViewById(R.id.tvNivel);
-            lnBackColor = (LinearLayout) itemView.findViewById(R.id.lnBackColor);
+            tvAtributo =  itemView.findViewById(R.id.tvAtributo);
+            tvResposta =  itemView.findViewById(R.id.tvResposta);
+            tvNivel =  itemView.findViewById(R.id.tvNivel);
+            lnBackColor =  itemView.findViewById(R.id.lnBackColor);
             itemView.setOnClickListener(this);
         }
 
@@ -75,7 +73,7 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
         flag_ContemInformacao = (mDataset.get(position).getTrustLevel() <= 0) ? false : true;
 
         if (flag_ContemInformacao) {
-            holder.tvResposta.setText("Decisão Mecanismo: " + IntToStringDecision(mDataset.get(position).getDataAttributes().getInferred()));
+            holder.tvResposta.setText("Decisão Mecanismo: " + IntToStringDecision(mDataset.get(position).getState()));
             holder.tvNivel.setText("Nivel Confiança: " + mDataset.get(position).getTrustLevel().toString() + " %");
         } else {
             holder.tvResposta.setText("A informação solicitada não contêm na sua base de dados.");
@@ -157,6 +155,7 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
     }
 
     private String IntToStringDecision(int code) {
+        Log.i("TAG", "code:"+code);
         if (code == context.getResources().getInteger(R.integer.ACCEPT)) {
             return ALLOW;
         } else {
@@ -211,7 +210,7 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
             edtInformacaoResp.setVisibility(View.GONE);
             tvInserirResp.setVisibility(View.GONE);
 
-            tvRespostaResp.setText("Decisão Mecanismo: " + IntToStringDecision(mDataset.get(position).getDataAttributes().getInferred()));
+            tvRespostaResp.setText("Decisão Mecanismo: " + IntToStringDecision(mDataset.get(position).getState()));
             tvNivelResp.setText("Nivel Confiança: " + mDataset.get(position).getTrustLevel().toString() + " %");
 
         } else {

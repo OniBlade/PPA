@@ -16,7 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import clientrest.com.clientrest.DataBase.Entity.HistoryObject;
 import clientrest.com.clientrest.Frament.Configuration_Fragment;
+import clientrest.com.clientrest.Frament.History_List_Fragment;
 import clientrest.com.clientrest.Frament.Request_Fragment;
 import clientrest.com.clientrest.Frament.Request_List_Fragment;
 import clientrest.com.clientrest.R;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         Request_List_Fragment.OnListFragmentInteractionListener,
         Request_Fragment.OnListFragmentInteractionListener,
+        History_List_Fragment.OnListFragmentInteractionListener,
         Configuration_Fragment.OnFragmentInteractionListener {
 
     @Override
@@ -134,15 +137,18 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_camera) {
             swap = false;
         } else if (id == R.id.nav_gallery) {
-            TAG = "Notification_Main";
-            fragmentClass = Request_List_Fragment.class;
+            TAG = "History_List_Fragment";
+            fragmentClass = History_List_Fragment.class;
             mBundle.putInt("column-count", 0);
+
         } else if (id == R.id.nav_slideshow) {
             TAG ="Configuration_Fragment";
             fragmentClass = Configuration_Fragment.class;
 
         } else if (id == R.id.nav_manage) {
-            swap = false;
+            TAG = "Notification_Main";
+            fragmentClass = Request_List_Fragment.class;
+            mBundle.putInt("column-count", 0);
 
         } else if (id == R.id.nav_share) {
             swap = false;
@@ -183,6 +189,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(HistoryObject item) {
 
     }
 }

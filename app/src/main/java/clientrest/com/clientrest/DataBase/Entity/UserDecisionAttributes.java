@@ -5,6 +5,8 @@
  */
 package clientrest.com.clientrest.DataBase.Entity;
 
+import android.util.Log;
+
 /**
  * @author Fagner Roger
  */
@@ -45,7 +47,11 @@ public class UserDecisionAttributes {
     }
 
     public void setInformation(String information) {
-        this.information = information;
+        if (information != null) {
+            this.information = information;
+        } else {
+            this.information = "";
+        }
     }
 
     public DataAttributes getDataAtttributeId() {

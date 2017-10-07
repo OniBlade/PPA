@@ -13,6 +13,7 @@ package clientrest.com.clientrest.DataBase.Entity;
 public class InferredDecisionAttributes  {
 
     private static final long serialVersionUID = 1L;
+    private int state;
     private Double trustLevel;
     private DataAttributes dataAttributes;
     private InferredDecision inferredDecisionId;
@@ -21,7 +22,14 @@ public class InferredDecisionAttributes  {
     }
 
 
-    
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
     public Double getTrustLevel() {
         return trustLevel;
     }
