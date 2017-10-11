@@ -1,12 +1,15 @@
 package clientrest.com.clientrest.Agents;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import java.util.List;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.Service.MLP;
+import clientrest.com.clientrest.Service.MQTTService;
 
 /**
  * Created by Fagner Roger on 03/10/2017.
@@ -15,6 +18,7 @@ import clientrest.com.clientrest.Service.MLP;
 public class AnalyzeData {
 
     private final static String TAG = "AnalyzeData";
+    private static int PUBLISH = 4;
     private Context context;
 
     public AnalyzeData(Context context) {
@@ -67,10 +71,11 @@ public class AnalyzeData {
                     Log.i(TAG, "updateCheckUserRequest");
                     database.updateCheckUserRequest(requestList.get(i), true);
                 }else{
-                    Log.i(TAG, "não precisa prever");
-                    Log.i(TAG, "getCheckUser: "+requestList.get(i).getCheckUser());
+                    //não precisa prever
                     database.updateCheckUserRequest(requestList.get(i), false);
                     database.updateRequestStatus(requestList.get(i),true);
+
+                    sendReplyConsumer(requestList.get(i));
                 }
                 flag = false;
             }
@@ -103,6 +108,19 @@ public class AnalyzeData {
 
     private String getStringParam(int shared) {
         return  (shared == 0)?"no":"yes";
+    }
+
+
+
+    private void sendReplyConsumer(Request request){
+        DBHelper database = new DBHelper(context);
+        Intent intent = new Intent(context, MQTTService.class);
+        Bundle mBundle2 = new Bundle();
+        mBundle2.putInt("CODE", PUBLISH);
+        mBundle2.putString("reply", database.getConsumerResponse(request));
+        mBundle2.putString("topic",request.getUuid());
+        intent.putExtras(mBundle2);
+        context.startService(intent);
     }
 
 

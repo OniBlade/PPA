@@ -18,8 +18,17 @@ public class UserDecisionAttributes {
     private String information;
     private DataAttributes dataAtttributeId;
     private UserDecision userDecisionId;
+    private String anonymised_information;
 
     public UserDecisionAttributes() {
+    }
+
+    public String getAnonymised_information() {
+        return anonymised_information;
+    }
+
+    public void setAnonymised_information(String anonymised_information) {
+        this.anonymised_information = anonymised_information;
     }
 
     public UserDecisionAttributes(Integer userDecisionAttributesId) {

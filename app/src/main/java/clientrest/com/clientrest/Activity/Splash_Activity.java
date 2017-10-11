@@ -4,16 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-
-import java.io.IOException;
 
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.Service.MQTTService;
 
 
-public class SplashActivity extends AppCompatActivity {
+public class Splash_Activity extends AppCompatActivity {
 
 
     private final int SPLASH_DISPLAY_LENGTH = 1000;
@@ -51,9 +48,9 @@ public class SplashActivity extends AppCompatActivity {
                 it.putExtras(mBundle);
                 startService(it);
 
-                Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
-                SplashActivity.this.startActivity(mainIntent);
-                SplashActivity.this.finish();
+                Intent mainIntent = new Intent(Splash_Activity.this, MainActivity.class);
+                Splash_Activity.this.startActivity(mainIntent);
+                Splash_Activity.this.finish();
             }
         }, SPLASH_DISPLAY_LENGTH);
     }

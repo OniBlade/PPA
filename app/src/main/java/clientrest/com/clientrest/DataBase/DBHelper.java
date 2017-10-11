@@ -395,12 +395,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put("attribute", attribute);
         contentValues.put("value", information);
-        Log.i(TAG, "Attribute: " + attribute);
-        Log.i(TAG, "value: " + information);
-        int id = 0;
-        id = DataBase_insert("things", null, contentValues);
-        Log.i(TAG, "id: " + id);
-
+        DataBase_insert("things", null, contentValues);
     }
 
     public boolean saveInferred_Decision(Request request, int j, String[] prediction, boolean isPrediction) {
@@ -445,7 +440,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private int StringToIntDecision(String s) {
-        Log.i("StringToIntDecision", "string: " + s);
         if (s.equals(ALLOW)) {
             return 1;
         } else {
@@ -569,8 +563,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 InferredDecisionAttributes inferredDecisionAttributes = new InferredDecisionAttributes();
                 inferredDecisionAttributes.setInferredDecisionId(inferredDecision);
                 inferredDecisionAttributes.setDataAttributes(getDataAttributesForId(res.getInt(0)));
+                inferredDecisionAttributes.setInferredDecisionAttributesId(res.getInt(1));
                 inferredDecisionAttributes.setTrustLevel(res.getDouble(2));
                 inferredDecisionAttributes.setState(res.getInt(4));
+                inferredDecisionAttributes.setAnonymised_information(res.getString(5));
                 inferredDecisionAttributesList.add(inferredDecisionAttributes);
                 res.moveToNext();
             }
@@ -621,10 +617,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 UserDecisionAttributes userDecisionAttributes = new UserDecisionAttributes();
                 userDecisionAttributes.setInformation(res.getString(0));
                 userDecisionAttributes.setState(res.getInt(1));
-                Log.i(TAG, "DecisionBD: " + res.getInt(1));
                 userDecisionAttributes.setUserDecisionAttributesId(res.getInt(2));
                 userDecisionAttributes.setUserDecisionId(userDecision);
                 userDecisionAttributes.setDataAtttributeId(getDataAttributesForId(res.getInt(4)));
+                userDecisionAttributes.setAnonymised_information(res.getString(5));
                 userDecisionAttributesList.add(userDecisionAttributes);
                 res.moveToNext();
             }
@@ -785,8 +781,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             res = db.rawQuery(sql, null);
             res.moveToFirst();
-            Log.i(TAG, "Tamanho item =" + res.getCount());
-            while (!res.isAfterLast()) {
+             while (!res.isAfterLast()) {
                 HistoryObject historyObject = new HistoryObject();
                 historyObject.setData_attributes_id(res.getInt(0));
                 historyObject.setConsumer_attribute(res.getString(1));
@@ -794,7 +789,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 historyObject.setRequest_reason(res.getString(3));
                 historyObject.setData_attributes_attribute(res.getString(4));
                 historyObject.setInferred_decision_attributes_state(res.getInt(5));
-                Log.i(TAG, "history decision:" + res.getInt(5));
                 historyObject.setInferred_decision_attributes_trust_level(res.getDouble(6));
                 historyObjectArrayList.add(historyObject);
                 res.moveToNext();
@@ -869,7 +863,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public void saveTraining_set(Request request) {
         ContentValues contentValues = new ContentValues();
         for (int i = 0; i < request.getUserDecisionId().getUserDecisionAttributesList().size(); i++) {
-            Log.e(TAG, "saveTraining_set consumer id: " + request.getConsumerId().toString());
             contentValues.put("device_type", request.getConsumerId().getConsumerId());
             contentValues.put("data_type", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getAttribute());
             contentValues.put("user_benefit", request.getUserBenefit());
@@ -974,7 +967,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 int end = headerMLP.length();
                 String aux = headerMLP.substring(in, end);//@attribute device_type
                 aux = aux.substring(0, aux.indexOf("}"));
-                Log.e(TAG, "String consumer header: " + aux);
                 if (aux.contains(String.valueOf(consumerId.getConsumerId()))) {
                     return true;
                 } else {
@@ -992,6 +984,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public String getConsumerResponse(Request request) {
+        request = getRequest(request.getRequestId());
         JSONObject jsonObject = null;
         boolean flag;
         try {
@@ -1011,14 +1004,14 @@ public class DBHelper extends SQLiteOpenHelper {
                     dataArray.put(itemObject);
                 }
             } else {  // mecanismo que respondeu
-                for (int i = 0; i < request.getUserDecisionId().getUserDecisionAttributesList().size(); i++) {
+                for (int i = 0; i < request.getInferredDecisionId().getInferredDecisionAttributesList().size(); i++) {
                     JSONObject itemObject = new JSONObject();
-                    itemObject.put("attribute", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getAttribute());
-                    flag = (request.getUserDecisionId().getUserDecisionAttributesList().get(i).getState() == 3) ? true : false;
+                    itemObject.put("attribute", request.getInferredDecisionId().getInferredDecisionAttributesList().get(i).getDataAttributes().getAttribute());
+                    flag = (request.getInferredDecisionId().getInferredDecisionAttributesList().get(i).getState() == 3) ? true : false;
                     if (!flag) {
-                        itemObject.put("value", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getInformation());
+                        itemObject.put("value", getThingsAttribute(request.getInferredDecisionId().getInferredDecisionAttributesList().get(i).getDataAttributes().getAttribute()));
                     }
-                    itemObject.put("state", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getState());
+                    itemObject.put("state", request.getInferredDecisionId().getInferredDecisionAttributesList().get(i).getState());
                     dataArray.put(itemObject);
                 }
             }
@@ -1028,8 +1021,143 @@ public class DBHelper extends SQLiteOpenHelper {
         } catch (JSONException e) {
             Log.e(TAG, e.getLocalizedMessage());
         }
-        Log.e(TAG, jsonObject.toString());
 
         return jsonObject.toString();
     }
+
+
+    public void saveRequestJson(String obj) {
+        try {
+            Request request = new Request();
+            JSONObject jsonObject = new JSONObject(obj);
+            request.setLocation(jsonObject.getString("location"));
+            request.setReason(jsonObject.getString("reason"));
+            request.setUuid(jsonObject.getString("uuid"));
+            request.setDataId(saveDataJSON(obj));
+            request.setConsumerId(saveConsumerJSON(obj));
+            saveRequest(request);
+        } catch (JSONException e) {
+            Log.d(TAG, e.getLocalizedMessage());
+        }
+    }
+
+    private Data saveDataJSON(String obj) {
+        try {
+            JSONObject jsonObject = new JSONObject(obj);
+            JSONArray jsonArray = jsonObject.getJSONArray("data");
+            Data data = new Data();
+            data.setDataId(saveData(data));
+            List<DataAttributes> dataAttributesList = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                DataAttributes dataAttributes = new DataAttributes();
+                dataAttributes.setDataId(data.getDataId());
+                dataAttributes.setAttribute(jsonArray.getJSONObject(i).getString("attribute"));
+                dataAttributes.setRetention(jsonArray.getJSONObject(i).getString("retention"));
+                dataAttributes.setShared((jsonArray.getJSONObject(i).getBoolean("shared")) ? 1 : 0);
+                saveDataAttributes(dataAttributes);
+                dataAttributesList.add(dataAttributes);
+            }
+            data.setDataAttributesList(dataAttributesList);
+            return data;
+        } catch (JSONException e) {
+            Log.d(TAG, e.getLocalizedMessage());
+        }
+        return null;
+    }
+
+    private Consumer saveConsumerJSON(String obj) {
+        try {
+            JSONObject jsonObject = new JSONObject(obj);
+            JSONArray jsonArray = jsonObject.getJSONArray("consumer");
+
+            Consumer consumer = new Consumer();
+            if (getExistUUID(jsonObject.getString("uuid"))) {
+                consumer = getConsumer(getConsumerForUUID(jsonObject.getString("uuid")));
+            } else {
+                consumer.setConsumerId(saveConsumer(consumer));
+                List<ConsumerAttributes> consumerAttributesList = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    ConsumerAttributes consumerAttributes = new ConsumerAttributes();
+                    consumerAttributes.setConsumerId(consumer.getConsumerId());
+                    consumerAttributes.setAttribute(jsonArray.getJSONObject(i).getString("attribute"));
+                    consumerAttributes.setValue(jsonArray.getJSONObject(i).getString("value"));
+                    saveConsumerAttributes(consumerAttributes);
+                    consumerAttributesList.add(consumerAttributes);
+                }
+                consumer.setConsumerAttributesList(consumerAttributesList);
+            }
+            return consumer;
+        } catch (JSONException e) {
+            Log.d(TAG, e.getLocalizedMessage());
+        }
+        return null;
+    }
+
+    public void updateUserDecisionAttributes(UserDecisionAttributes userDecisionAttributes) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("state", userDecisionAttributes.getState());
+        contentValues.put("information", userDecisionAttributes.getInformation());
+        contentValues.put("anonymised_information", userDecisionAttributes.getAnonymised_information());
+        DataBase_update("user_decision_attributes", contentValues, "user_decision_attributes_id = ? ", new String[]{Integer.toString(userDecisionAttributes.getUserDecisionAttributesId())});
+
+    }
+
+    public String getThingsAttribute(String attribute) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = null;
+        try {
+            res = db.rawQuery("select * from things where attribute = \"" + attribute + "\"", null);
+            res.moveToFirst();
+            return res.getString(2);
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            db.close();
+        }
+    }
+
+    public String getConsumerResponseNegotiated(Request request) {
+        request = getRequest(request.getRequestId());
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject();
+            jsonObject.put("request_code", request.getRequestId());
+
+            JSONArray dataArray = new JSONArray();
+            if (request.getCheckUser() == 1) {  // usuario que respondeu
+                for (int i = 0; i < request.getUserDecisionId().getUserDecisionAttributesList().size(); i++) {
+                    if (request.getUserDecisionId().getUserDecisionAttributesList().get(i).getState() == 3) {
+                        JSONObject itemObject = new JSONObject();
+                        itemObject.put("attribute", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getAttribute());
+                        itemObject.put("value", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getAnonymised_information());
+                        dataArray.put(itemObject);
+                    }
+                }
+            } else {  // mecanismo que respondeu
+                for (int i = 0; i < request.getInferredDecisionId().getInferredDecisionAttributesList().size(); i++) {
+                    if (request.getInferredDecisionId().getInferredDecisionAttributesList().get(i).getState() == 3) {
+                        JSONObject itemObject = new JSONObject();
+                        itemObject.put("attribute", request.getInferredDecisionId().getInferredDecisionAttributesList().get(i).getDataAttributes().getAttribute());
+                        itemObject.put("value", request.getInferredDecisionId().getInferredDecisionAttributesList().get(i).getAnonymised_information());
+                        dataArray.put(itemObject);
+                    }
+                }
+            }
+            jsonObject.put("data", dataArray);
+
+
+        } catch (JSONException e) {
+            Log.e(TAG, e.getLocalizedMessage());
+        }
+        return jsonObject.toString();
+    }
+
+    public void updateInferredDecision(InferredDecisionAttributes inferredDecisionAttributes) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("state", inferredDecisionAttributes.getState());
+        contentValues.put("anonymised_information", inferredDecisionAttributes.getAnonymised_information());
+        DataBase_update("inferred_decision_attributes", contentValues, "inferred_decision_attributes_id = ? ", new String[]{Integer.toString(inferredDecisionAttributes.getInferredDecisionAttributesId())});
+    }
+
 }

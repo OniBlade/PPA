@@ -6,11 +6,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import clientrest.com.clientrest.R;
 
-public class PrivacyActivity extends AppCompatActivity {
+public class Privacy_Setting_Activity extends AppCompatActivity {
 
     private SeekBar seekBar;
     private TextView tvDisplay;
@@ -51,9 +50,9 @@ public class PrivacyActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        Intent mainIntent = new Intent(PrivacyActivity.this, MainActivity.class);
-        PrivacyActivity.this.startActivity(mainIntent);
-        PrivacyActivity.this.finish();
+        Intent mainIntent = new Intent(Privacy_Setting_Activity.this, MainActivity.class);
+        Privacy_Setting_Activity.this.startActivity(mainIntent);
+        Privacy_Setting_Activity.this.finish();
         return;
     }
 

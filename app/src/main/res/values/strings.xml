@@ -51,6 +51,7 @@
     `user_decision_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `user_decision_id`	integer NOT NULL,
     `data_attribute_id`	integer NOT NULL,
+    `anonymised_information` varchar ( 45 ),
     FOREIGN KEY(`user_decision_id`) REFERENCES `user_decision`(`user_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`data_attribute_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>
@@ -69,6 +70,7 @@
     `request_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `check_user`	integer,
     `user_benefit`	varchar ( 45 ),
+     `anonymised_information` varchar ( 45 ),
     FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`consumer_id`) REFERENCES `consumer`(`consumer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`user_decision_id`) REFERENCES `user_decision`(`user_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -80,6 +82,7 @@
     `trust_level`	varchar,
     `inferred_decision_id`	integer NOT NULL,
      `state` integer,
+        `anonymised_information` varchar,
     FOREIGN KEY(`data_attributes_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`inferred_decision_id`) REFERENCES `inferred_decision`(`inferred_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>

@@ -29,7 +29,8 @@ import java.net.URL;
 import clientrest.com.clientrest.*;
 import clientrest.com.clientrest.Activity.MainActivity;
 import clientrest.com.clientrest.Agents.AnalyzeData;
-import clientrest.com.clientrest.DataBase.Controller.Request_Controller;
+import clientrest.com.clientrest.Agents.Negotiator;
+import clientrest.com.clientrest.DataBase.DBHelper;
 
 public class MQTTService extends Service {
 
@@ -40,6 +41,7 @@ public class MQTTService extends Service {
     private static int SAVE_NEW_REQUEST = 2;
     private static int PROCESSING_REQUESTS = 3;
     private static int PUBLISH = 4;
+    private static int NEGOTIATOR_ANSWER=5;
     MemoryPersistence persistence;
     MqttClient mqttClient;
 
@@ -71,7 +73,8 @@ public class MQTTService extends Service {
                 new AnalyzeData(context);
             } else if (codeId == PUBLISH) {
                 new sendInformationConsumer().execute(intent.getExtras().getString("topic"), intent.getExtras().getString("reply"));
-
+            } else if (codeId == NEGOTIATOR_ANSWER){
+                new Negotiator(context,intent.getExtras().getString("ANSWER"));
             }
         }
         return (super.onStartCommand(intent, flags, startId));
@@ -214,15 +217,22 @@ public class MQTTService extends Service {
             if (!CheckRequest(param[0])) {
                 GenerateReturnPort(param[0]);
 
-                Request_Controller request_controller = new Request_Controller(context);
-                request_controller.saveRequest(param[0]);
+                DBHelper database = new DBHelper(context);
+                database.saveRequestJson(param[0]);
+
                 Intent intent = new Intent(context, MQTTService.class);
                 Bundle mBundle = new Bundle();
                 mBundle.putInt("CODE", PROCESSING_REQUESTS);
                 intent.putExtras(mBundle);
-
                 startService(intent);
             } else {
+                Intent intent = new Intent(context, MQTTService.class);
+                Bundle mBundle = new Bundle();
+                mBundle.putInt("CODE", NEGOTIATOR_ANSWER);
+                mBundle.putString("ANSWER", param[0]);
+                intent.putExtras(mBundle);
+                startService(intent);
+
                 Log.i("MQTTService", "request Existe");//fazer quando ele ja existe
             }
             //showNotification();
@@ -250,7 +260,7 @@ public class MQTTService extends Service {
     private boolean CheckRequest(String obj) {
         try {
             JSONObject jsonObject = new JSONObject(obj);
-            String request_id = jsonObject.getString("request_id");
+            String request_id = jsonObject.getString("request_code");
             return true;
         } catch (JSONException e) {
             return false;

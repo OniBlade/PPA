@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity
             fragmentClass = Configuration_Fragment.class;
 
         } else if (id == R.id.nav_manage) {
-            Intent mainIntent = new Intent(MainActivity.this, PrivacyActivity.class);
+            Intent mainIntent = new Intent(MainActivity.this, Privacy_Setting_Activity.class);
             MainActivity.this.startActivity(mainIntent);
             MainActivity.this.finish();
             swap = false;
