@@ -58,11 +58,7 @@ public class Request {
     }
 
     public void setCheckUser(boolean checkUser) {
-        if (checkUser) {
-            this.checkUser = 1;
-        } else {
-            this.checkUser = 0;
-        }
+        this.checkUser = (checkUser)? 1:0;
     }
 
     public Integer getState() {

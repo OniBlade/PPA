@@ -1,17 +1,27 @@
 package clientrest.com.clientrest.Frament;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -21,6 +31,8 @@ import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
+import clientrest.com.clientrest.Service.MLP;
+import clientrest.com.clientrest.Service.MQTTService;
 import clientrest.com.clientrest.dummy.DummyContent;
 
 
@@ -37,6 +49,10 @@ public class Request_Fragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static int PUBLISH = 4;
+    private ObjectAnimator anim;
+    private View DialogView;
+    private AlertDialog Dialog;
 
 
     // TODO: Rename and change types of parameters
@@ -53,6 +69,7 @@ public class Request_Fragment extends Fragment {
     private RecyclerView recyclerView;
     private OnListFragmentInteractionListener mListener;
     private Request_List_Fragment.OnListFragmentInteractionListener mListener2;
+    private ProgressBar mProgressBar;
 
     public Request_Fragment() {
         // Required empty public constructor
@@ -86,6 +103,7 @@ public class Request_Fragment extends Fragment {
     }
 
     private void instantiateComponents(View view) {
+        mProgressBar =  view.findViewById(R.id.circular_progress_bar);
         btn_Concluir = view.findViewById(R.id.btn_Concluir);
         tvRequesting_Number = view.findViewById(R.id.tvRequesting_Number);
         cvConsumidor = view.findViewById(R.id.cvConsumidor);
@@ -119,9 +137,8 @@ public class Request_Fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (checkAllAttributes()) {
-                    FinalizeRequest();
-                    Toast.makeText(context, "Finalizado com sucesso!!!", Toast.LENGTH_LONG).show();
-                    fragmentJump();
+                    new FinishTask().execute();
+
                 } else {
                     Toast.makeText(context, "É necesario responder todos os dados solicitados", Toast.LENGTH_LONG).show();
                 }
@@ -181,7 +198,21 @@ public class Request_Fragment extends Fragment {
     private void FinalizeRequest() {
         DBHelper database = new DBHelper(context);
         database.updateRequestStatus(request, true);
+        database.saveTraining_set(request);
     }
+
+    private void sendReplyConsumer(){
+        DBHelper database = new DBHelper(context);
+        Intent intent = new Intent(context, MQTTService.class);
+        Bundle mBundle2 = new Bundle();
+        mBundle2.putInt("CODE", PUBLISH);
+        mBundle2.putString("reply", database.getConsumerResponse(request));
+        mBundle2.putString("topic",request.getUuid());
+        intent.putExtras(mBundle2);
+        context.startService(intent);
+    }
+
+
 
     private boolean checkAllAttributes() {
         updateRequest();
@@ -243,6 +274,36 @@ public class Request_Fragment extends Fragment {
         mListener = null;
     }
 
+
+    private class FinishTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            LayoutInflater factory = LayoutInflater.from(context);
+            DialogView = factory.inflate(R.layout.finalize_task_dialog, null);
+            Dialog = new AlertDialog.Builder(context).create();
+            Dialog.setView(DialogView);
+            Dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... urls) {
+            FinalizeRequest();
+            sendReplyConsumer();
+            MLP mlp = new MLP(context);
+            mlp.RetrainMLP();
+            fragmentJump();
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Dialog.dismiss();
+            Toast.makeText(context, "Finalizado com sucesso!!!", Toast.LENGTH_LONG).show();
+        }
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

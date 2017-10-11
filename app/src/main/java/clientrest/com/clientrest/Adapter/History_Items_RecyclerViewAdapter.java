@@ -24,6 +24,7 @@ import clientrest.com.clientrest.R;
 public class History_Items_RecyclerViewAdapter extends RecyclerView.Adapter<History_Items_RecyclerViewAdapter.ViewHolder> {
 
     private Context context;
+    private boolean isInferredMechanism;
     private final List<HistoryObject> mValues;
     private final OnListFragmentInteractionListener mListener;
 
@@ -51,10 +52,11 @@ public class History_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Hist
         }
     }
 
-    public History_Items_RecyclerViewAdapter(List<HistoryObject> items, OnListFragmentInteractionListener listener, Context context) {
+    public History_Items_RecyclerViewAdapter(List<HistoryObject> items, OnListFragmentInteractionListener listener, Context context, int CODE) {
         this.context = context;
         mValues = items;
         mListener = listener;
+        isInferredMechanism = (CODE==0)? true:false;
     }
 
     @Override
@@ -69,8 +71,12 @@ public class History_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Hist
         holder.tvConsumer.setText("Solicitante: " + mValues.get(position).getConsumer_attribute() + " " + mValues.get(position).getConsumer_value());
         holder.tvReason.setText("Motivo: " + mValues.get(position).getRequest_reason());
         holder.tvAttribute.setText("Atributo: " + mValues.get(position).getData_attributes_attribute());
-        holder.tvTrustLevel.setText("Nível Confiança " + mValues.get(position).getInferred_decision_attributes_trust_level().toString());
-
+        if(isInferredMechanism) {
+            holder.tvTrustLevel.setVisibility(View.VISIBLE);
+            holder.tvTrustLevel.setText("Nível Confiança: " + mValues.get(position).getInferred_decision_attributes_trust_level().toString() + " %");
+        }else{
+            holder.tvTrustLevel.setVisibility(View.GONE);
+        }
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

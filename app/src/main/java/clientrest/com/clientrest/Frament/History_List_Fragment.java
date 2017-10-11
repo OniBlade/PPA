@@ -30,8 +30,10 @@ public class History_List_Fragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_CODE = "CODE";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private int code =0;
     private OnListFragmentInteractionListener mListener;
 
     /**
@@ -57,6 +59,7 @@ public class History_List_Fragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            code =  getArguments().getInt(ARG_CODE);
         }
     }
 
@@ -74,7 +77,7 @@ public class History_List_Fragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new History_Items_RecyclerViewAdapter(getDataSet(), mListener, getContext()));
+            recyclerView.setAdapter(new History_Items_RecyclerViewAdapter(getDataSet(), mListener, getContext(), code));
         }
         return view;
     }
@@ -82,10 +85,13 @@ public class History_List_Fragment extends Fragment {
     private List<HistoryObject> getDataSet() {
         List<HistoryObject> results;
         DBHelper dataBase = new DBHelper(getContext());
-        results = dataBase.getHistory();
+        if (code==0) {
+            results = dataBase.getHistoryMechanism();
+        }else{
+            results = dataBase.getHistoryUser();
+        }
         return results;
     }
-
 
 
     @Override

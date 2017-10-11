@@ -1,5 +1,6 @@
 package clientrest.com.clientrest.Activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -67,7 +68,6 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 switchContent(R.id.content_main, fragment, "Notification_Main");
-
             }
         });
 
@@ -110,13 +110,13 @@ public class MainActivity extends AppCompatActivity
             Configuration_Fragment mFragment = new Configuration_Fragment();
             Bundle mBundle = new Bundle();
             mFragment.setArguments(mBundle);
-            switchContent(R.id.content_main, mFragment,"Configuration_Fragment");
+            switchContent(R.id.content_main, mFragment, "Configuration_Fragment");
 
             return true;
-        }else{
-             if (id == R.id.action_exit) {
-                 finish();
-             }
+        } else {
+            if (id == R.id.action_exit) {
+                finish();
+            }
         }
 
 
@@ -135,20 +135,33 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            swap = false;
-        } else if (id == R.id.nav_gallery) {
-            TAG = "History_List_Fragment";
-            fragmentClass = History_List_Fragment.class;
-            mBundle.putInt("column-count", 0);
-
-        } else if (id == R.id.nav_slideshow) {
-            TAG ="Configuration_Fragment";
-            fragmentClass = Configuration_Fragment.class;
-
-        } else if (id == R.id.nav_manage) {
             TAG = "Notification_Main";
             fragmentClass = Request_List_Fragment.class;
             mBundle.putInt("column-count", 0);
+
+        } else if (id == R.id.nav_gallery) {
+            swap = false;
+
+        } else if (id == R.id.nav_inferred_mechanism) {
+            TAG = "History_List_Fragment";
+            fragmentClass = History_List_Fragment.class;
+            mBundle.putInt("column-count", 0);
+            mBundle.putInt("CODE",0);
+        } else if (id == R.id.nav_inferred_user) {
+            TAG = "History_List_Fragment";
+            fragmentClass = History_List_Fragment.class;
+            mBundle.putInt("column-count", 0);
+            mBundle.putInt("CODE",1);
+
+        } else if (id == R.id.nav_slideshow) {
+            TAG = "Configuration_Fragment";
+            fragmentClass = Configuration_Fragment.class;
+
+        } else if (id == R.id.nav_manage) {
+            Intent mainIntent = new Intent(MainActivity.this, PrivacyActivity.class);
+            MainActivity.this.startActivity(mainIntent);
+            MainActivity.this.finish();
+            swap = false;
 
         } else if (id == R.id.nav_share) {
             swap = false;

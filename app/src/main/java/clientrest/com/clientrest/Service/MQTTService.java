@@ -28,23 +28,18 @@ import java.net.URL;
 
 import clientrest.com.clientrest.*;
 import clientrest.com.clientrest.Activity.MainActivity;
+import clientrest.com.clientrest.Agents.AnalyzeData;
 import clientrest.com.clientrest.DataBase.Controller.Request_Controller;
-import clientrest.com.clientrest.DataBase.DBHelper;
 
 public class MQTTService extends Service {
 
 
     private static String broker = "tcp://m13.cloudmqtt.com:19314";
-    private static String password = "consumer";
-    private static String userName = "consumer";
-    private static String topic = "Solicitar";
-    private static String content = "Solicitação Teste";
-    private static String clientId = "";
     private static Context context;
-    private Request_Controller request_controller;
     private static int TRAIN_MLP = 1;
     private static int SAVE_NEW_REQUEST = 2;
     private static int PROCESSING_REQUESTS = 3;
+    private static int PUBLISH = 4;
     MemoryPersistence persistence;
     MqttClient mqttClient;
 
@@ -55,9 +50,7 @@ public class MQTTService extends Service {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
-        subscribe();
-        request_controller = new Request_Controller(context);
-
+        Subscribe();
     }
 
     @Override
@@ -72,53 +65,83 @@ public class MQTTService extends Service {
             int codeId = intent.getExtras().getInt("CODE");
             if (codeId == TRAIN_MLP) {
                 new Training_MultilayerPerceptron().execute();
-            } else {
-                if (codeId == SAVE_NEW_REQUEST) {
-                    new SaveRequest().execute(intent.getExtras().getString("request"));
-                } else {
-                    if (codeId == PROCESSING_REQUESTS) {
-                        new ProcessRequest(context);
-                    }
-                }
-            }
+            } else if (codeId == SAVE_NEW_REQUEST) {
+                new SaveRequest().execute(intent.getExtras().getString("request"));
+            } else if (codeId == PROCESSING_REQUESTS) {
+                new AnalyzeData(context);
+            } else if (codeId == PUBLISH) {
+                new sendInformationConsumer().execute(intent.getExtras().getString("topic"), intent.getExtras().getString("reply"));
 
+            }
         }
         return (super.onStartCommand(intent, flags, startId));
     }
 
-    private void subscribe() {
-        persistence = new MemoryPersistence();
+
+    private void Publish(String topic, String content) {
+        String clientId = MqttClient.generateClientId();
+        MemoryPersistence persistence = new MemoryPersistence();
         try {
-            mqttClient = new MqttClient(broker, clientId, persistence);
+            MqttClient mqttClient = new MqttClient(broker, clientId, persistence);
             mqttClient.setCallback(new MqttCallback() {
-                public void messageArrived(String topic, MqttMessage msg) throws Exception {
-                    Log.i("MQTTService", "messageArrived");
-                    Intent it = new Intent(context, MQTTService.class);
-                    Bundle mBundle = new Bundle();
-                    mBundle.putInt("CODE", SAVE_NEW_REQUEST);
-                    mBundle.putString("request", msg.toString());
-                    it.putExtras(mBundle);
-                    startService(it);
+                public void messageArrived(String topic, MqttMessage msg)
+                        throws Exception {
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken arg0) {
-                    Log.i("MQTTService", "deliveryComplete");
                 }
 
                 public void connectionLost(Throwable arg0) {
-                    Log.i("MQTTService", "connectionLost");
-                    subscribe();
+                    // TODO Auto-generated method stub
                 }
             });
 
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
-            connOpts.setUserName(userName);
-            connOpts.setPassword(password.toCharArray());
+            connOpts.setUserName("user");
+            connOpts.setPassword("user".toCharArray());
             mqttClient.connect(connOpts);
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(1);
-            mqttClient.subscribe(topic, 1);
+            mqttClient.publish(topic, message);
+            mqttClient.disconnect();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void Subscribe() {
+        persistence = new MemoryPersistence();
+        try {
+            mqttClient = new MqttClient(broker, "134679", persistence);
+            mqttClient.setCallback(new MqttCallback() {
+                public void messageArrived(String topic, MqttMessage msg) throws Exception {
+
+                    Intent intent = new Intent(context, MQTTService.class);
+                    Bundle mBundle = new Bundle();
+                    mBundle.putInt("CODE", SAVE_NEW_REQUEST);
+                    mBundle.putString("request", msg.toString());
+                    intent.putExtras(mBundle);
+                    startService(intent);
+                }
+
+                public void deliveryComplete(IMqttDeliveryToken arg0) {
+                }
+
+                public void connectionLost(Throwable arg0) {
+                    Subscribe();
+                }
+            });
+
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+            connOpts.setUserName("user");
+            connOpts.setPassword("user".toCharArray());
+            mqttClient.connect(connOpts);
+            MqttMessage message = new MqttMessage("".getBytes());
+            message.setQos(1);
+            mqttClient.subscribe("request", 1);
 
         } catch (MqttException e) {
             e.printStackTrace();
@@ -139,7 +162,6 @@ public class MQTTService extends Service {
         } catch (JSONException e) {
             Log.i("MQTTService", "GenerateReturnPort" + e.toString());
         }
-
     }
 
     private void CreateACLByUser(String str) {
@@ -191,25 +213,38 @@ public class MQTTService extends Service {
             boolean ret = false;
             if (!CheckRequest(param[0])) {
                 GenerateReturnPort(param[0]);
+
+                Request_Controller request_controller = new Request_Controller(context);
                 request_controller.saveRequest(param[0]);
-                Intent it = new Intent(context, MQTTService.class);
+                Intent intent = new Intent(context, MQTTService.class);
                 Bundle mBundle = new Bundle();
                 mBundle.putInt("CODE", PROCESSING_REQUESTS);
-                it.putExtras(mBundle);
-                startService(it);
+                intent.putExtras(mBundle);
+
+                startService(intent);
             } else {
                 Log.i("MQTTService", "request Existe");//fazer quando ele ja existe
             }
-            showNotification();
+            //showNotification();
             return ret;
         }
     }
 
     private class Training_MultilayerPerceptron extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(String... param) {
-            new MLP(context);
+            MLP mlp = new MLP(context);
+            mlp.RetrainMLP();
             return null;
         }
+
+    }
+
+    private class sendInformationConsumer extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(String... param) {
+            Publish(param[0], param[1]);
+            return null;
+        }
+
     }
 
     private boolean CheckRequest(String obj) {

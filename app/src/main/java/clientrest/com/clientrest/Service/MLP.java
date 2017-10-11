@@ -2,6 +2,7 @@ package clientrest.com.clientrest.Service;
 
 import android.content.Context;
 import android.util.Log;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
@@ -13,6 +14,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
 import weka.classifiers.Evaluation;
@@ -38,12 +40,16 @@ public class MLP {
 
     public MLP(Context context) {
         this.context = context;
+    }
+
+    public void RetrainMLP() {
         setString_train(getArffFormattedFile());
         this.train = ObjInstances(getString_train());
         MultilayerPerceptron();
     }
 
     public MLP(Context context, String train_test) {
+        Log.e(TAG,train_test);
         this.context = context;
         this.test = ObjInstances(getStringReadTest(train_test));
         setMlp(getMLPDataBase());
@@ -58,15 +64,11 @@ public class MLP {
     }
 
     public StringReader getString_train() {
-        return string_train;
+         return string_train;
     }
 
     public void setString_train(String string_train) {
         this.string_train = new StringReader(string_train);
-    }
-
-    public StringReader getString_train_test() {
-        return string_train_test;
     }
 
     public StringReader getStringReadTest(String string_train_test) {
@@ -100,7 +102,7 @@ public class MLP {
         DBHelper database = new DBHelper(context);
         StringBuilder arff = new StringBuilder();
         StringBuilder data = new StringBuilder();
-        Set<Integer> deviceType = new HashSet<>();
+        //Set<Integer> deviceType = new HashSet<>();
         Set<String> dataType = new HashSet<>();
 
         String delimiter = ",";
@@ -114,13 +116,14 @@ public class MLP {
             data.append(trainingSetList.get(i).getShared() + delimiter);
             data.append(trainingSetList.get(i).getInferred() + delimiter);
             data.append(trainingSetList.get(i).getResult() + "\n");
-            deviceType.add(trainingSetList.get(i).getDeviceType());
+            //deviceType.add(trainingSetList.get(i).getDeviceType());
             dataType.add(trainingSetList.get(i).getDataType());
         }
-        header = getHeaderArff(deviceType, dataType);
+        header = getHeaderArff(database.getAllConsumer(), dataType);
         arff.append(header.toString());
         arff.append(data.toString());
         arff.append("\n");
+        Log.e(TAG,arff.toString());
         return arff.toString();
     }
 
@@ -191,6 +194,7 @@ public class MLP {
         }
         return null;
     }
+
 
     public Evaluation crossValidate() throws Exception {
         Evaluation eval = new Evaluation(getTrain());

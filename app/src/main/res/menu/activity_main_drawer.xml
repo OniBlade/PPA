@@ -10,7 +10,19 @@
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Historicos"
-            android:visible="true" />
+            android:visible="true">
+            <menu>
+                <item
+                    android:id="@+id/nav_inferred_mechanism"
+                    android:icon="@drawable/ic_menu_gallery"
+                    android:title="Inferência Mecanismo" />
+                <item
+                    android:id="@+id/nav_inferred_user"
+                    android:icon="@drawable/ic_menu_gallery"
+                    android:title="Inferência Usuário" />
+            </menu>
+        </item>
+
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"

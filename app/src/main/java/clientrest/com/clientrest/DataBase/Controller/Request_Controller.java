@@ -6,8 +6,10 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Consumer;
 import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
@@ -75,17 +77,23 @@ public class Request_Controller {
             JSONArray jsonArray = jsonObject.getJSONArray("consumer");
 
             Consumer consumer = new Consumer();
-            consumer.setConsumerId(database.saveConsumer(consumer));
-            List<ConsumerAttributes> consumerAttributesList = new ArrayList<>();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                ConsumerAttributes consumerAttributes = new ConsumerAttributes();
-                consumerAttributes.setConsumerId(consumer.getConsumerId());
-                consumerAttributes.setAttribute(jsonArray.getJSONObject(i).getString("attribute"));
-                consumerAttributes.setValue(jsonArray.getJSONObject(i).getString("value"));
-                database.saveConsumerAttributes(consumerAttributes);
-                consumerAttributesList.add(consumerAttributes);
+            if (database.getExistUUID(jsonObject.getString("uuid"))) {
+                consumer = database.getConsumer(database.getConsumerForUUID(jsonObject.getString("uuid")));
+                Log.e(TAG,"getExistUUID consumer id: "+consumer.getConsumerId());
+            } else {
+                consumer.setConsumerId(database.saveConsumer(consumer));
+                Log.e(TAG,"consumer id: "+consumer.getConsumerId());
+                List<ConsumerAttributes> consumerAttributesList = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    ConsumerAttributes consumerAttributes = new ConsumerAttributes();
+                    consumerAttributes.setConsumerId(consumer.getConsumerId());
+                    consumerAttributes.setAttribute(jsonArray.getJSONObject(i).getString("attribute"));
+                    consumerAttributes.setValue(jsonArray.getJSONObject(i).getString("value"));
+                    database.saveConsumerAttributes(consumerAttributes);
+                    consumerAttributesList.add(consumerAttributes);
+                }
+                consumer.setConsumerAttributesList(consumerAttributesList);
             }
-            consumer.setConsumerAttributesList(consumerAttributesList);
             return consumer;
         } catch (JSONException e) {
             Log.d(TAG, e.getLocalizedMessage());

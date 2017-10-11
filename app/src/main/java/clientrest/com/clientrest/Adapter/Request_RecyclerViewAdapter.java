@@ -33,6 +33,28 @@ public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Re
         mListener = listener;
     }
 
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView tvPedido;
+        public final TextView tvSolicitante;
+        public final TextView tvMotivo;
+        public final TextView tvNumPedido;
+
+        public ViewHolder(View view) {
+            super(view);
+            mView = view;
+            tvPedido =  itemView.findViewById(R.id.tvAtributo);
+            tvSolicitante =  itemView.findViewById(R.id.tvsolicitante);
+            tvMotivo = itemView.findViewById(R.id.tvMotivo);
+            tvNumPedido = itemView.findViewById(R.id.tvNumPedido);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " '" + tvSolicitante.getText() + "'";
+        }
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.request_items_list, parent, false);
@@ -45,14 +67,13 @@ public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Re
 
         holder.tvPedido.setText("N° Pedido:");
         holder.tvNumPedido.setText(mValues.get(position).getRequestId().toString());
-        holder.tvSolicitante.setText((mValues.get(position).getConsumerId().getConsumerAttributesList().get(0).getValue()));
-        holder.tvMotivo.setText(mValues.get(position).getReason());
+        holder.tvSolicitante.setText("Solicitante: "+(mValues.get(position).getConsumerId().getConsumerAttributesList().get(0).getValue()));
+        holder.tvMotivo.setText("Motivo: "+mValues.get(position).getReason());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    //  mListener.onListFragmentInteraction(holder.mItem);
                     fragmentJump(mValues.get(position));
                 }
 
@@ -77,31 +98,10 @@ public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Re
         }
     }
 
-
     @Override
     public int getItemCount() {
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView tvPedido;
-        public final TextView tvSolicitante;
-        public final TextView tvMotivo;
-        public final TextView tvNumPedido;
 
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            tvPedido =  itemView.findViewById(R.id.tvAtributo);
-            tvSolicitante =  itemView.findViewById(R.id.tvsolicitante);
-            tvMotivo = itemView.findViewById(R.id.tvMotivo);
-            tvNumPedido = itemView.findViewById(R.id.tvNumPedido);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + tvSolicitante.getText() + "'";
-        }
-    }
 }

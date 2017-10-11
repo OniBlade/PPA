@@ -12,7 +12,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
 import java.util.List;
+
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
@@ -26,6 +30,9 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
     private List<InferredDecisionAttributes> mDataset;
     private static MyClickListener myClickListener;
     private TextView tvAtributoResp, tvRespostaResp, tvNivelResp, tvInserirResp;
+    private TextView tvLocation, tvRetention, tvShared, tvInferred;
+    private LinearLayout linearResp, linearNivel;
+    private View viewRes, viewNivel;
     private static final String ALLOW = "Permitir";
     private static final String DENY = "Negar";
     private static final String NEGOTIATE = "Negociar";
@@ -38,10 +45,10 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
 
         public DataObjectHolder(View itemView) {
             super(itemView);
-            tvAtributo =  itemView.findViewById(R.id.tvAtributo);
-            tvResposta =  itemView.findViewById(R.id.tvResposta);
-            tvNivel =  itemView.findViewById(R.id.tvNivel);
-            lnBackColor =  itemView.findViewById(R.id.lnBackColor);
+            tvAtributo = itemView.findViewById(R.id.tvAtributo);
+            tvResposta = itemView.findViewById(R.id.tvResposta);
+            tvNivel = itemView.findViewById(R.id.tvNivel);
+            lnBackColor = itemView.findViewById(R.id.lnBackColor);
             itemView.setOnClickListener(this);
         }
 
@@ -101,7 +108,7 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
                             Dialog.dismiss();
                         } else {
                             if (!edtInformacaoResp.getText().toString().trim().equals("")) {
-                                dabase.saveUserDecision(request, mDataset.get(position).getDataAttributes(), context.getResources().getInteger(R.integer.ACCEPT), "");
+                                dabase.saveUserDecision(request, mDataset.get(position).getDataAttributes(), context.getResources().getInteger(R.integer.ACCEPT), edtInformacaoResp.getText().toString());
                                 holder.lnBackColor.setBackgroundColor(Color.GREEN);
                                 holder.itemView.refreshDrawableState();
                                 Dialog.dismiss();
@@ -155,7 +162,7 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
     }
 
     private String IntToStringDecision(int code) {
-        Log.i("TAG", "code:"+code);
+        Log.i("TAG", "code:" + code);
         if (code == context.getResources().getInteger(R.integer.ACCEPT)) {
             return ALLOW;
         } else {
@@ -200,24 +207,43 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
         tvNivelResp = DialogView.findViewById(R.id.tvNivelResp);
         tvInserirResp = DialogView.findViewById(R.id.tvInserirResp);
         edtInformacaoResp = DialogView.findViewById(R.id.edtInformacaoResp);
+        tvLocation = DialogView.findViewById(R.id.tvLocation);
+        tvRetention = DialogView.findViewById(R.id.tvRetention);
+        tvShared = DialogView.findViewById(R.id.tvShared);
+        tvInferred = DialogView.findViewById(R.id.tvInferred);
+        linearNivel = DialogView.findViewById(R.id.linearNivel);
+        linearResp = DialogView.findViewById(R.id.linearResp);
+        viewRes = DialogView.findViewById(R.id.viewResp);
+        viewNivel = DialogView.findViewById(R.id.viewNivel);
 
         flag_ContemInformacao = (mDataset.get(position).getTrustLevel() <= 0) ? false : true;
-        tvAtributoResp.setText("Atributo: " + mDataset.get(position).getDataAttributes().getAttribute());
+        tvAtributoResp.setText(mDataset.get(position).getDataAttributes().getAttribute());
+        String aux = (mDataset.get(position).getDataAttributes().getShared().equals(1)) ? "Sim" : "Não";
+        tvShared.setText(aux);
+        tvLocation.setText(request.getLocation());
+        aux = (mDataset.get(position).getDataAttributes().getInferred().equals(1)) ? "Sim" : "Não";
+        tvInferred.setText(aux);
+        tvRetention.setText(mDataset.get(position).getDataAttributes().getRetention());
+
         if (flag_ContemInformacao) {
-            tvRespostaResp.setVisibility(View.VISIBLE);
-            tvNivelResp.setVisibility(View.VISIBLE);
+            linearResp.setVisibility(View.VISIBLE);
+            linearNivel.setVisibility(View.VISIBLE);
+            viewRes.setVisibility(View.VISIBLE);
+            viewNivel.setVisibility(View.VISIBLE);
 
             edtInformacaoResp.setVisibility(View.GONE);
             tvInserirResp.setVisibility(View.GONE);
 
-            tvRespostaResp.setText("Decisão Mecanismo: " + IntToStringDecision(mDataset.get(position).getState()));
-            tvNivelResp.setText("Nivel Confiança: " + mDataset.get(position).getTrustLevel().toString() + " %");
+            tvRespostaResp.setText(IntToStringDecision(mDataset.get(position).getState()));
+            tvNivelResp.setText(mDataset.get(position).getTrustLevel().toString() + " %");
 
         } else {
-            tvRespostaResp.setVisibility(View.GONE);
-            tvNivelResp.setVisibility(View.GONE);
+            linearResp.setVisibility(View.GONE);
+            linearNivel.setVisibility(View.GONE);
+            viewRes.setVisibility(View.GONE);
+            viewNivel.setVisibility(View.GONE);
 
-            tvInserirResp.setText("A informação solicitada não contêm na sua base de dados \nInsira esta informação:");
+            tvInserirResp.setText("A informação solicitada não contêm na sua base de dados. \nInsira esta informação:");
             edtInformacaoResp.setVisibility(View.VISIBLE);
             tvInserirResp.setVisibility(View.VISIBLE);
             if (request.getUserDecisionId().getUserDecisionId() != 0) {
