@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;import clientrest.com.clientrest.Adapter.Request_RecyclerViewAdapter;
+import android.view.ViewGroup;import clientrest.com.clientrest.Adapter.Request_Adapter;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
@@ -68,7 +68,7 @@ public class Request_List_Fragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new Request_RecyclerViewAdapter(getDataSet(), mListener));
+            recyclerView.setAdapter(new Request_Adapter(getDataSet(), mListener));
         }
         return view;
     }

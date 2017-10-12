@@ -12,21 +12,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.List;
 
 import clientrest.com.clientrest.Activity.MainActivity;
-import clientrest.com.clientrest.Adapter.Request_Items_RecyclerViewAdapter;
+import clientrest.com.clientrest.Adapter.Request_Items_Adapter;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
@@ -128,7 +123,7 @@ public class Request_Fragment extends Fragment {
         instantiateComponents(view);
 
         tvRequesting_Number.setText(request.getRequestId().toString());
-        recyclerView.setAdapter(new Request_Items_RecyclerViewAdapter(request, view.getContext()));
+        recyclerView.setAdapter(new Request_Items_Adapter(request, view.getContext()));
 
         item_img_dados.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
         recyclerView.setVisibility(View.VISIBLE);

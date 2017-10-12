@@ -207,7 +207,7 @@ public class MLP {
             String[] params = new String[2];
             double aux = 0;
             double[] prediction;
-            prediction = getMlp().distributionForInstance(getTest().get(0));
+            prediction = getMlp().distributionForInstance(getTest().get(0)); // verificar erro
             for (int i = 0; i < prediction.length; i++) {
                 if (i == 0) {
                     aux = prediction[i];

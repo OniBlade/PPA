@@ -106,20 +106,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Configuration_Fragment mFragment = new Configuration_Fragment();
-            Bundle mBundle = new Bundle();
-            mFragment.setArguments(mBundle);
-            switchContent(R.id.content_main, mFragment, "Configuration_Fragment");
-
-            return true;
-        } else {
-            if (id == R.id.action_exit) {
-                finish();
-            }
+        if (id == R.id.action_exit) {
+            finish();
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -146,19 +135,19 @@ public class MainActivity extends AppCompatActivity
             TAG = "History_List_Fragment";
             fragmentClass = History_List_Fragment.class;
             mBundle.putInt("column-count", 0);
-            mBundle.putInt("CODE",0);
+            mBundle.putInt("CODE", 0);
         } else if (id == R.id.nav_inferred_user) {
             TAG = "History_List_Fragment";
             fragmentClass = History_List_Fragment.class;
             mBundle.putInt("column-count", 0);
-            mBundle.putInt("CODE",1);
+            mBundle.putInt("CODE", 1);
 
         } else if (id == R.id.nav_slideshow) {
             TAG = "Configuration_Fragment";
             fragmentClass = Configuration_Fragment.class;
 
         } else if (id == R.id.nav_manage) {
-            Intent mainIntent = new Intent(MainActivity.this, Privacy_Setting_Activity.class);
+            Intent mainIntent = new Intent(MainActivity.this, SettingsActivity.class);
             MainActivity.this.startActivity(mainIntent);
             MainActivity.this.finish();
             swap = false;

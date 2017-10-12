@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -20,20 +19,17 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import clientrest.com.clientrest.*;
 import clientrest.com.clientrest.Activity.MainActivity;
 import clientrest.com.clientrest.Agents.AnalyzeData;
 import clientrest.com.clientrest.Agents.Negotiator;
 import clientrest.com.clientrest.DataBase.DBHelper;
-
+import clientrest.com.clientrest.DataBase.Entity.Settings;
+import clientrest.com.clientrest.R;
 public class MQTTService extends Service {
-
 
     private static String broker = "tcp://m13.cloudmqtt.com:19314";
     private static Context context;
@@ -41,7 +37,7 @@ public class MQTTService extends Service {
     private static int SAVE_NEW_REQUEST = 2;
     private static int PROCESSING_REQUESTS = 3;
     private static int PUBLISH = 4;
-    private static int NEGOTIATOR_ANSWER=5;
+    private static int NEGOTIATOR_ANSWER = 5;
     MemoryPersistence persistence;
     MqttClient mqttClient;
 
@@ -50,6 +46,7 @@ public class MQTTService extends Service {
 
     @Override
     public void onCreate() {
+        Log.e("MQTT", "onCreate");
         super.onCreate();
         context = getApplicationContext();
         Subscribe();
@@ -73,8 +70,8 @@ public class MQTTService extends Service {
                 new AnalyzeData(context);
             } else if (codeId == PUBLISH) {
                 new sendInformationConsumer().execute(intent.getExtras().getString("topic"), intent.getExtras().getString("reply"));
-            } else if (codeId == NEGOTIATOR_ANSWER){
-                new Negotiator(context,intent.getExtras().getString("ANSWER"));
+            } else if (codeId == NEGOTIATOR_ANSWER) {
+                new Negotiator(context, intent.getExtras().getString("ANSWER"));
             }
         }
         return (super.onStartCommand(intent, flags, startId));
@@ -147,7 +144,15 @@ public class MQTTService extends Service {
             mqttClient.subscribe("request", 1);
 
         } catch (MqttException e) {
-            e.printStackTrace();
+            Log.e("MQTT first Catch",e.getMessage());
+
+            try {
+                mqttClient.disconnect();
+                Subscribe();
+            } catch (MqttException e1) {
+               Log.e("MQTT disconect",e1.getMessage());
+            }
+
         }
     }
 
@@ -216,8 +221,9 @@ public class MQTTService extends Service {
             boolean ret = false;
             if (!CheckRequest(param[0])) {
                 GenerateReturnPort(param[0]);
-
                 DBHelper database = new DBHelper(context);
+                checksAndSendsNotification(database, param[0]);
+
                 database.saveRequestJson(param[0]);
 
                 Intent intent = new Intent(context, MQTTService.class);
@@ -225,6 +231,7 @@ public class MQTTService extends Service {
                 mBundle.putInt("CODE", PROCESSING_REQUESTS);
                 intent.putExtras(mBundle);
                 startService(intent);
+
             } else {
                 Intent intent = new Intent(context, MQTTService.class);
                 Bundle mBundle = new Bundle();
@@ -235,8 +242,30 @@ public class MQTTService extends Service {
 
                 Log.i("MQTTService", "request Existe");//fazer quando ele ja existe
             }
-            //showNotification();
+
             return ret;
+        }
+    }
+
+    private void checksAndSendsNotification(DBHelper database, String param) {
+        Settings settings = database.getLastPrivacySettings();
+        Log.e("mqtt", "checksAndSendsNotification");
+        if (settings.getAlwaysNotify() == 1) {
+            showNotification();
+        } else {
+            if (settings.getNotifyNewConsumer() == 1) {
+                try {
+                    JSONObject jsonObject = new JSONObject(param);
+                    if (!database.getExistUUID(jsonObject.getString("uuid"))) {
+                        Log.e("TAG", "vai receber notificação");
+                        showNotification();
+                    }else{
+                        Log.e("TAG", "nao entrou");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -260,7 +289,7 @@ public class MQTTService extends Service {
     private boolean CheckRequest(String obj) {
         try {
             JSONObject jsonObject = new JSONObject(obj);
-            String request_id = jsonObject.getString("request_code");
+            jsonObject.getString("request_code");
             return true;
         } catch (JSONException e) {
             return false;

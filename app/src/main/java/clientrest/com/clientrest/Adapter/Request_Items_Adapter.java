@@ -13,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 import clientrest.com.clientrest.DataBase.DBHelper;
@@ -22,7 +20,7 @@ import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
 
-public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Items_RecyclerViewAdapter.DataObjectHolder> {
+public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Adapter.DataObjectHolder> {
     private Context context;
     private Request request;
     boolean flag_ContemInformacao;
@@ -58,7 +56,7 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
         }
     }
 
-    public Request_Items_RecyclerViewAdapter(Request request, Context context) {
+    public Request_Items_Adapter(Request request, Context context) {
         this.context = context;
         this.request = request;
         mDataset = request.getInferredDecisionId().getInferredDecisionAttributesList();
@@ -223,7 +221,7 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
         tvLocation.setText(request.getLocation());
         aux = (mDataset.get(position).getDataAttributes().getInferred().equals(1)) ? "Sim" : "Não";
         tvInferred.setText(aux);
-        tvRetention.setText(mDataset.get(position).getDataAttributes().getRetention());
+        tvRetention.setText(getStringRetention(mDataset.get(position).getDataAttributes().getRetention()));
 
         if (flag_ContemInformacao) {
             linearResp.setVisibility(View.VISIBLE);
@@ -256,6 +254,20 @@ public class Request_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Requ
                     }
                 }
             }
+        }
+    }
+
+    private String getStringRetention(String retention) {
+        if(retention.equals("semi_public")){
+            return "Semi público";
+        }else if(retention.equals("public")){
+            return "Público";
+        }else if(retention.equals("your_place")){
+            return "Seu local";
+        }else if(retention.equals("someone_else_place")){
+            return "Local de outra pessoa";
+        }else{
+            return null;
         }
     }
 

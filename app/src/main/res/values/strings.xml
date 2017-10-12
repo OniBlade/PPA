@@ -137,14 +137,16 @@
     </string>
 
     <string name="configuration">
-        CREATE TABLE IF NOT EXISTS `configuration` (
+        CREATE TABLE IF NOT EXISTS `settings` (
   `configuration_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   `confidence_level`integer ,
   `always_notify` integer ,
   `notify_new_consumer` integer ,
-  `sound_notification` integer )
+  `sound_notification` integer,
+        `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP )
     </string>
 
+    <string name="privacy_setting_pattern">insert into settings(confidence_level,always_notify,notify_new_consumer,sound_notification) values (95, 1,0,1); </string>
     <string name="conjunto_teste1"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"nome\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
     <string name="conjunto_teste2"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"data_nascimento\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
     <string name="conjunto_teste3"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"email\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"no\",\"allow\"); </string>
@@ -286,6 +288,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_settings_">Settings_Activity</string>
 
 
 </resources>

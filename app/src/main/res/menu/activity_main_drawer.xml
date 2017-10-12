@@ -5,7 +5,7 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_notifications_black_18dp"
-            android:title="Notificações Pendente" />
+            android:title="Solicitações Pendentes" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
@@ -30,7 +30,7 @@
             android:visible="false" />
         <item
             android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_settings_black_18dp"
             android:title="Configurações" />
     </group>
 

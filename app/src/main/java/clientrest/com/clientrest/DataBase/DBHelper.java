@@ -33,6 +33,7 @@ import clientrest.com.clientrest.DataBase.Entity.HistoryObject;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecision;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
+import clientrest.com.clientrest.DataBase.Entity.Settings;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
 import clientrest.com.clientrest.DataBase.Entity.UserDecision;
 import clientrest.com.clientrest.DataBase.Entity.UserDecisionAttributes;
@@ -73,6 +74,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(myContext.getResources().getString(R.string.model_models));
         db.execSQL(myContext.getResources().getString(R.string.things));
         db.execSQL(myContext.getResources().getString(R.string.configuration));
+        db.execSQL(myContext.getResources().getString(R.string.privacy_setting_pattern));
 /*
 
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste1));
@@ -456,7 +458,8 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private double getUserConfidenceLevel() {
-        return 75.8;
+        Settings settings = getLastPrivacySettings();
+        return Double.valueOf(settings.getConfidenceLevel());
     }
 
     private double getPercentage(String v) {
@@ -781,7 +784,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             res = db.rawQuery(sql, null);
             res.moveToFirst();
-             while (!res.isAfterLast()) {
+            while (!res.isAfterLast()) {
                 HistoryObject historyObject = new HistoryObject();
                 historyObject.setData_attributes_id(res.getInt(0));
                 historyObject.setConsumer_attribute(res.getString(1));
@@ -903,9 +906,12 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor res = null;
         try {
             res = db.rawQuery("select * from request where uuid= \"" + uuid + "\"", null);
+            res.moveToFirst();
             if (res.getCount() > 0) {
+                Log.e("getExistUUID", "TRUE");
                 return true;
             } else {
+                Log.e("getExistUUID", "FALSE");
                 return false;
             }
         } finally {
@@ -1074,6 +1080,7 @@ public class DBHelper extends SQLiteOpenHelper {
             if (getExistUUID(jsonObject.getString("uuid"))) {
                 consumer = getConsumer(getConsumerForUUID(jsonObject.getString("uuid")));
             } else {
+
                 consumer.setConsumerId(saveConsumer(consumer));
                 List<ConsumerAttributes> consumerAttributesList = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -1160,4 +1167,34 @@ public class DBHelper extends SQLiteOpenHelper {
         DataBase_update("inferred_decision_attributes", contentValues, "inferred_decision_attributes_id = ? ", new String[]{Integer.toString(inferredDecisionAttributes.getInferredDecisionAttributesId())});
     }
 
+    public Settings getLastPrivacySettings() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = null;
+        Settings settings;
+        try {
+            res = db.rawQuery("select * from settings ORDER BY configuration_id DESC LIMIT 1", null);
+            res.moveToFirst();
+            settings = new Settings();
+            settings.setConfigurationId(res.getInt(0));
+            settings.setConfidenceLevel(res.getInt(1));
+            settings.setAlwaysNotify(res.getInt(2));
+            settings.setNotifyNewConsumer(res.getInt(3));
+            settings.setSoundNotification(res.getInt(4));
+            return settings;
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            db.close();
+        }
+    }
+
+    public void insertPrivacySetting(Settings settings) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("always_notify", settings.getAlwaysNotify());
+        contentValues.put("confidence_level", settings.getConfidenceLevel());
+        contentValues.put("notify_new_consumer", settings.getNotifyNewConsumer());
+        contentValues.put("sound_notification", settings.getSoundNotification());
+        DataBase_insert("settings", null, contentValues);
+    }
 }

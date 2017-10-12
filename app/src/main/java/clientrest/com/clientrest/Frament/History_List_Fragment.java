@@ -12,13 +12,10 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import clientrest.com.clientrest.Adapter.History_Items_RecyclerViewAdapter;
+import clientrest.com.clientrest.Adapter.History_Items_Adapter;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.HistoryObject;
-import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
-import clientrest.com.clientrest.Frament.dummy.DummyContent;
-import clientrest.com.clientrest.Frament.dummy.DummyContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.
@@ -77,7 +74,7 @@ public class History_List_Fragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new History_Items_RecyclerViewAdapter(getDataSet(), mListener, getContext(), code));
+            recyclerView.setAdapter(new History_Items_Adapter(getDataSet(), mListener, getContext(), code));
         }
         return view;
     }

@@ -22,13 +22,13 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_RecyclerViewAdapter.ViewHolder> {
+public class Request_Adapter extends RecyclerView.Adapter<Request_Adapter.ViewHolder> {
 
     private final List<Request> mValues;
     private final OnListFragmentInteractionListener mListener;
     private Context context;
 
-    public Request_RecyclerViewAdapter(List<Request> items, OnListFragmentInteractionListener listener) {
+    public Request_Adapter(List<Request> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

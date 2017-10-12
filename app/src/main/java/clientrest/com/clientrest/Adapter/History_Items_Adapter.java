@@ -21,7 +21,7 @@ import clientrest.com.clientrest.R;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class History_Items_RecyclerViewAdapter extends RecyclerView.Adapter<History_Items_RecyclerViewAdapter.ViewHolder> {
+public class History_Items_Adapter extends RecyclerView.Adapter<History_Items_Adapter.ViewHolder> {
 
     private Context context;
     private boolean isInferredMechanism;
@@ -52,7 +52,7 @@ public class History_Items_RecyclerViewAdapter extends RecyclerView.Adapter<Hist
         }
     }
 
-    public History_Items_RecyclerViewAdapter(List<HistoryObject> items, OnListFragmentInteractionListener listener, Context context, int CODE) {
+    public History_Items_Adapter(List<HistoryObject> items, OnListFragmentInteractionListener listener, Context context, int CODE) {
         this.context = context;
         mValues = items;
         mListener = listener;

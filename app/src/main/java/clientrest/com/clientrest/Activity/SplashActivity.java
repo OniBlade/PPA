@@ -10,7 +10,7 @@ import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.Service.MQTTService;
 
 
-public class Splash_Activity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
 
 
     private final int SPLASH_DISPLAY_LENGTH = 1000;
@@ -48,9 +48,9 @@ public class Splash_Activity extends AppCompatActivity {
                 it.putExtras(mBundle);
                 startService(it);
 
-                Intent mainIntent = new Intent(Splash_Activity.this, MainActivity.class);
-                Splash_Activity.this.startActivity(mainIntent);
-                Splash_Activity.this.finish();
+                Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+                SplashActivity.this.startActivity(mainIntent);
+                SplashActivity.this.finish();
             }
         }, SPLASH_DISPLAY_LENGTH);
     }
