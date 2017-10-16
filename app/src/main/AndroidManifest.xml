@@ -34,8 +34,8 @@
         <receiver
             android:name=".Broadcast.Broadcast"
             android:enabled="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
-            android:exported="false">
+            android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -45,18 +45,21 @@
             android:name=".Service.MQTTService"
             android:enabled="true"
             android:exported="false">
-            <!--    <intent-filter>
+
+            <!--
+               <intent-filter>
                    <category android:name="android.intent.category.DEFAULT" />
 
                    <action android:name="MQTTService" />
-               </intent-filter>-->
+               </intent-filter>
+            -->
         </service>
 
         <activity android:name=".Activity.Settings.PrivacySetting" />
         <activity android:name=".Activity.Settings.NotificationSettings" />
         <activity android:name=".Activity.Settings.MQTTSettings" />
         <activity android:name=".Activity.Settings.HelpSettings" />
-        <activity android:name=".Activity.Settings.DBSettings"></activity>
+        <activity android:name=".Activity.Settings.DBSettings" />
 
         <activity
             android:name=".Activity.SettingsActivity"

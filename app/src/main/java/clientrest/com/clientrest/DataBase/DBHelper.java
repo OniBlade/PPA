@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import clientrest.com.clientrest.DataBase.Entity.HistoryObject;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecision;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
+import clientrest.com.clientrest.DataBase.Entity.Scenarios;
 import clientrest.com.clientrest.DataBase.Entity.Settings;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
 import clientrest.com.clientrest.DataBase.Entity.UserDecision;
@@ -76,8 +78,13 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(myContext.getResources().getString(R.string.things));
         db.execSQL(myContext.getResources().getString(R.string.configuration));
         db.execSQL(myContext.getResources().getString(R.string.privacy_setting_pattern));
-/*
+        db.execSQL(myContext.getResources().getString(R.string.training_scenarios));
+        db.execSQL(myContext.getResources().getString(R.string.scenario1));
+        db.execSQL(myContext.getResources().getString(R.string.scenario2));
+        db.execSQL(myContext.getResources().getString(R.string.scenario3));
 
+
+        /*
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste1));
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste2));
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste3));
@@ -1253,5 +1260,36 @@ public class DBHelper extends SQLiteOpenHelper {
             DataBase_update("data_attributes", contentValues, "data_attributes_id = ? ", new String[]{Integer.toString(inferredDecisionAttributes.getDataAttributes().getDataAttributesId())});
 
         }
+    }
+
+    public List<Scenarios> getScenarios() {
+        List<Scenarios> scenariosList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = null;
+        try {
+            res = db.rawQuery("select * from training_scenarios where state=0 ", null);
+            res.moveToFirst();
+            while (!res.isAfterLast()) {
+                Scenarios scenarios = new Scenarios();
+                scenarios.setTrainingScenariosId(res.getInt(0));
+                scenarios.setScenario(res.getString(1));
+                scenarios.setState(res.getInt(2));
+                scenariosList.add(scenarios);
+                res.moveToNext();
+            }
+            return scenariosList;
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            db.close();
+        }
+    }
+
+    public void updateScenariosID(Scenarios scenarios) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("state", 1);
+        contentValues.put("decision", scenarios.getDecision());
+        DataBase_update("training_scenarios", contentValues, "training_scenarios_id = ? ", new String[]{Integer.toString(scenarios.getTrainingScenariosId())});
     }
 }

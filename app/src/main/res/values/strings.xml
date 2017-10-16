@@ -147,8 +147,18 @@
   `sound_notification` integer,
         `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP )
     </string>
+    <string name="training_scenarios">CREATE TABLE IF NOT EXISTS `training_scenarios` (
+  `training_scenarios_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `scenario` VARCHAR(255),
+  `state` INTEGER,
+        `decision` INTEGER);</string>
+
+    <string name="scenario1">insert into training_scenarios(scenario,state) values(\"1- Um posto de gasolina quer os dados do seu carro para manter um histórico de abastecimento. Os dados coletados não será compartilhados com terceiros e será mantido pelo posto até achar necessario. \",0);</string>
+    <string name="scenario2">insert into training_scenarios(scenario,state) values(\"2- Um posto de gasolina quer os dados do seu carro para manter um histórico de abastecimento. Os dados coletados não será compartilhados com terceiros e será mantido pelo posto até achar necessario. \",0);</string>
+    <string name="scenario3">insert into training_scenarios(scenario,state) values(\"3- Um posto de gasolina quer os dados do seu carro para manter um histórico de abastecimento. Os dados coletados não será compartilhados com terceiros e será mantido pelo posto até achar necessario. \",0);</string>
 
     <string name="privacy_setting_pattern">insert into settings(confidence_level,always_notify,notify_new_consumer,sound_notification) values (95, 1,0,1); </string>
+
     <string name="conjunto_teste1"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"nome\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
     <string name="conjunto_teste2"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"data_nascimento\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
     <string name="conjunto_teste3"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"email\",\"consumer\",\"forever\",\"semi_public\",\"yes\",\"no\",\"allow\"); </string>

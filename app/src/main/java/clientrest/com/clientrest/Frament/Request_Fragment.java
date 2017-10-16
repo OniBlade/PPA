@@ -324,7 +324,7 @@ public class Request_Fragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Dialog.dismiss();
-            Toast.makeText(context, "Finalizado com sucesso!!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Finalizado com sucesso!!!", Toast.LENGTH_SHORT).show();
         }
     }
 
