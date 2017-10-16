@@ -19,6 +19,8 @@ import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.MultilayerPerceptron;
+import weka.core.Attribute;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
@@ -102,7 +104,6 @@ public class MLP {
         DBHelper database = new DBHelper(context);
         StringBuilder arff = new StringBuilder();
         StringBuilder data = new StringBuilder();
-        //Set<Integer> deviceType = new HashSet<>();
         Set<String> dataType = new HashSet<>();
 
         String delimiter = ",";
@@ -116,8 +117,7 @@ public class MLP {
             data.append(trainingSetList.get(i).getShared() + delimiter);
             data.append(trainingSetList.get(i).getInferred() + delimiter);
             data.append(trainingSetList.get(i).getResult() + "\n");
-            //deviceType.add(trainingSetList.get(i).getDeviceType());
-            dataType.add(trainingSetList.get(i).getDataType());
+             dataType.add(trainingSetList.get(i).getDataType());
         }
         header = getHeaderArff(database.getAllConsumer(), dataType);
         arff.append(header.toString());
@@ -207,16 +207,18 @@ public class MLP {
             String[] params = new String[2];
             double aux = 0;
             double[] prediction;
-            prediction = getMlp().distributionForInstance(getTest().get(0)); // verificar erro
+
+            prediction = getMlp().distributionForInstance(getTest().get(0));
             for (int i = 0; i < prediction.length; i++) {
                 if (i == 0) {
                     aux = prediction[i];
                     params[0] = getTest().classAttribute().value(i);
                     params[1] = getFormated(prediction[i]);
                 } else {
-                    if (aux < prediction[i]) {
+                    if (prediction[i] > aux) {
                         params[0] = getTest().classAttribute().value(i);
                         params[1] = getFormated(prediction[i]);
+                        aux = prediction[i];
                     }
                 }
             }

@@ -96,7 +96,9 @@
     `shared`	integer,
     `data_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `retention`	varchar ( 45 ),
-    FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+     `training_set_id`integer,
+    FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (`training_set_id`)  REFERENCES `training_set` (`training_set_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>
     <string name="data">CREATE TABLE IF NOT EXISTS `data` (
     `data_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT

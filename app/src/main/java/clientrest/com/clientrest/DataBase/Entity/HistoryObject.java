@@ -5,6 +5,7 @@ package clientrest.com.clientrest.DataBase.Entity;
  */
 
 public class HistoryObject {
+    private int requestId;
     private int data_attributes_id;
     private String consumer_attribute;
     private String consumer_value;
@@ -14,6 +15,14 @@ public class HistoryObject {
     private Double inferred_decision_attributes_trust_level;
 
     public HistoryObject() {
+    }
+
+    public int getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(int requestId) {
+        this.requestId = requestId;
     }
 
     public int getData_attributes_id() {

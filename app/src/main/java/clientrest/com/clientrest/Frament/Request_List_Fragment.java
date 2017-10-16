@@ -8,11 +8,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;import clientrest.com.clientrest.Adapter.Request_Adapter;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import clientrest.com.clientrest.Adapter.Request_Adapter;
 import clientrest.com.clientrest.DataBase.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.dummy.DummyContent.DummyItem;
+
 import java.util.List;
 
 /**
@@ -28,6 +32,7 @@ public class Request_List_Fragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 0;
     private OnListFragmentInteractionListener mListener;
+    private TextView emptyView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -58,17 +63,24 @@ public class Request_List_Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.request_items_fragment, container, false);
-
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+        List<Request> dataset = getDataSet();
+        View view = null;
+        if (dataset.size() > 0) {
+            view = inflater.inflate(R.layout.request_items_fragment, container, false);
+            if (view instanceof RecyclerView) {
+                Context context = view.getContext();
+                RecyclerView recyclerView = (RecyclerView) view;
+                if (mColumnCount <= 1) {
+                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                } else {
+                    recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                }
+                recyclerView.setAdapter(new Request_Adapter(dataset, mListener));
             }
-            recyclerView.setAdapter(new Request_Adapter(getDataSet(), mListener));
+        } else {
+            view = inflater.inflate(R.layout.empty_layout, container, false);
+            emptyView = view.findViewById(R.id.empty_view);
+            emptyView.setText("Você não possui nenhuma solicitação!");
         }
         return view;
     }

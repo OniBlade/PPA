@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import clientrest.com.clientrest.Activity.Settings.DBSettings;
 import clientrest.com.clientrest.Activity.Settings.HelpSettings;
 import clientrest.com.clientrest.Activity.Settings.MQTTSettings;
 import clientrest.com.clientrest.Activity.Settings.NotificationSettings;
@@ -37,7 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
         lnDatabase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(SettingsActivity.this, PrivacySetting.class);
+                Intent mainIntent = new Intent(SettingsActivity.this, DBSettings.class);
                 SettingsActivity.this.startActivity(mainIntent);
 
             }

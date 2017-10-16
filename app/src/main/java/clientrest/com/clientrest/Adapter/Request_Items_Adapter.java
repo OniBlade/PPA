@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +24,7 @@ public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Ad
     private Request request;
     boolean flag_ContemInformacao;
     private EditText edtInformacaoResp;
+    private boolean isHistory, isInferredMechanism = false;
     private List<InferredDecisionAttributes> mDataset;
     private static MyClickListener myClickListener;
     private TextView tvAtributoResp, tvRespostaResp, tvNivelResp, tvInserirResp;
@@ -59,6 +59,16 @@ public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Ad
     public Request_Items_Adapter(Request request, Context context) {
         this.context = context;
         this.request = request;
+        this.isHistory = false;
+        this.isInferredMechanism =false;
+        mDataset = request.getInferredDecisionId().getInferredDecisionAttributesList();
+    }
+
+    public Request_Items_Adapter(Request request, Context context, boolean isInferredMechanism) {
+        this.context = context;
+        this.request = request;
+        this.isHistory = true;
+        this.isInferredMechanism = isInferredMechanism;
         mDataset = request.getInferredDecisionId().getInferredDecisionAttributesList();
     }
 
@@ -98,53 +108,24 @@ public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Ad
                 DialogView.findViewById(R.id.btnAutorizar).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DBHelper dabase = new DBHelper(context);
-                        if (flag_ContemInformacao) {
-                            dabase.saveUserDecision(request, mDataset.get(position).getDataAttributes(), context.getResources().getInteger(R.integer.ACCEPT), "");
-                            holder.lnBackColor.setBackgroundColor(Color.GREEN);
-                            holder.itemView.refreshDrawableState();
-                            Dialog.dismiss();
-                        } else {
-                            if (!edtInformacaoResp.getText().toString().trim().equals("")) {
-                                dabase.saveUserDecision(request, mDataset.get(position).getDataAttributes(), context.getResources().getInteger(R.integer.ACCEPT), edtInformacaoResp.getText().toString());
-                                holder.lnBackColor.setBackgroundColor(Color.GREEN);
-                                holder.itemView.refreshDrawableState();
-                                Dialog.dismiss();
-                            } else {
-                                Toast.makeText(context, "Informação não pode ser em branco!!!", Toast.LENGTH_LONG).show();
-                            }
-                        }
+
+                        updateInformation(flag_ContemInformacao, mDataset.get(position), R.integer.ACCEPT, edtInformacaoResp.getText().toString(), holder, Dialog);
+
                     }
                 });
                 DialogView.findViewById(R.id.btnNegociar).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DBHelper dabase = new DBHelper(context);
-                        if (flag_ContemInformacao) {
-                            dabase.saveUserDecision(request, mDataset.get(position).getDataAttributes(), context.getResources().getInteger(R.integer.NEGOTIATE), "");
-                            holder.lnBackColor.setBackgroundColor(Color.YELLOW);
-                            holder.itemView.refreshDrawableState();
-                            Dialog.dismiss();
-                        } else {
-                            if (!edtInformacaoResp.getText().toString().trim().equals("")) {
-                                dabase.saveUserDecision(request, mDataset.get(position).getDataAttributes(), context.getResources().getInteger(R.integer.NEGOTIATE), edtInformacaoResp.getText().toString());
-                                holder.lnBackColor.setBackgroundColor(Color.YELLOW);
-                                holder.itemView.refreshDrawableState();
-                                Dialog.dismiss();
-                            } else {
-                                Toast.makeText(context, "Informação não pode ser em branco!!!", Toast.LENGTH_LONG).show();
-                            }
-                        }
+
+                        updateInformation(flag_ContemInformacao, mDataset.get(position), R.integer.NEGOTIATE, edtInformacaoResp.getText().toString(), holder, Dialog);
+
                     }
                 });
                 DialogView.findViewById(R.id.btnNegar).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DBHelper dabase = new DBHelper(context);
-                        dabase.saveUserDecision(request, mDataset.get(position).getDataAttributes(), context.getResources().getInteger(R.integer.DENY), edtInformacaoResp.getText().toString());
-                        holder.lnBackColor.setBackgroundColor(Color.RED);
-                        holder.itemView.refreshDrawableState();
-                        Dialog.dismiss();
+
+                        updateInformation(flag_ContemInformacao, mDataset.get(position), R.integer.DENY, edtInformacaoResp.getText().toString(), holder, Dialog);
 
                     }
                 });
@@ -154,49 +135,61 @@ public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Ad
 
     }
 
+    private void updateInformation(boolean flag_ContemInformacao, InferredDecisionAttributes inferredDecisionAttributes, int resp, String information, DataObjectHolder holder, AlertDialog dialog) {
+        DBHelper database = new DBHelper(context);
+        if (flag_ContemInformacao) {
+            database.saveUserDecision(request, inferredDecisionAttributes.getDataAttributes(), context.getResources().getInteger(resp), "");
+            if (isHistory && isInferredMechanism ) {
+                inferredDecisionAttributes.setState(context.getResources().getInteger(resp));
+                database.saveOrUpdateTraining(request, inferredDecisionAttributes);
+            }
+            RefreshColor(holder, context.getResources().getInteger(resp));
+            dialog.dismiss();
+        } else {
+            if (!information.trim().equals("") || context.getResources().getInteger(resp) ==2) {
+                database.saveUserDecision(request, inferredDecisionAttributes.getDataAttributes(), context.getResources().getInteger(resp), information);
+                if (isHistory && isInferredMechanism ) {
+                    inferredDecisionAttributes.setState(context.getResources().getInteger(resp));
+                    database.saveOrUpdateTraining(request, inferredDecisionAttributes);
+                }
+
+                RefreshColor(holder, context.getResources().getInteger(resp));
+                dialog.dismiss();
+            } else {
+                Toast.makeText(context, "Informação não pode ser em branco!!!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     private void updateRequest() {
         DBHelper database = new DBHelper(context);
         request = database.getRequest(request.getRequestId());
     }
 
-    private String IntToStringDecision(int code) {
-        Log.i("TAG", "code:" + code);
-        if (code == context.getResources().getInteger(R.integer.ACCEPT)) {
-            return ALLOW;
-        } else {
-            if (code == context.getResources().getInteger(R.integer.DENY)) {
-                return DENY;
-            } else {
-                if (code == context.getResources().getInteger(R.integer.NEGOTIATE)) {
-                    return NEGOTIATE;
-                } else {
-                    return null;
-                }
-            }
-        }
-    }
 
     private void RepaintItemView(DataObjectHolder holder, int posicao) {
         try {
-            int codigo = request.getUserDecisionId().getUserDecisionAttributesList().get(posicao).getState();
-            if (codigo == context.getResources().getInteger(R.integer.ACCEPT)) {
-                holder.lnBackColor.setBackgroundColor(Color.GREEN);
-                holder.itemView.refreshDrawableState();
+            int codigo = 0;
+            if (isHistory && isInferredMechanism) {
+                codigo = request.getInferredDecisionId().getInferredDecisionAttributesList().get(posicao).getState();
             } else {
-                if (codigo == context.getResources().getInteger(R.integer.NEGOTIATE)) {
-                    holder.lnBackColor.setBackgroundColor(Color.YELLOW);
-                    holder.itemView.refreshDrawableState();
-                } else {
-                    if (codigo == context.getResources().getInteger(R.integer.DENY)) {
-                        holder.lnBackColor.setBackgroundColor(Color.RED);
-                        holder.itemView.refreshDrawableState();
-                    }
-                }
+                codigo = request.getUserDecisionId().getUserDecisionAttributesList().get(posicao).getState();
             }
+            RefreshColor(holder, codigo);
         } catch (IndexOutOfBoundsException c) {
         }
     }
 
+    private void RefreshColor(DataObjectHolder holder, int idResult) {
+        if (idResult == 1) {
+            holder.lnBackColor.setBackgroundColor(Color.GREEN);
+        } else if (idResult == 2) {
+            holder.lnBackColor.setBackgroundColor(Color.RED);
+        } else if (idResult == 3) {
+            holder.lnBackColor.setBackgroundColor(Color.YELLOW);
+        }
+        holder.itemView.refreshDrawableState();
+    }
 
     private void addDialogInformation(View DialogView, int position) {
         updateRequest();
@@ -258,16 +251,32 @@ public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Ad
     }
 
     private String getStringRetention(String retention) {
-        if(retention.equals("semi_public")){
+        if (retention.equals("semi_public")) {
             return "Semi público";
-        }else if(retention.equals("public")){
+        } else if (retention.equals("public")) {
             return "Público";
-        }else if(retention.equals("your_place")){
+        } else if (retention.equals("your_place")) {
             return "Seu local";
-        }else if(retention.equals("someone_else_place")){
+        } else if (retention.equals("someone_else_place")) {
             return "Local de outra pessoa";
-        }else{
+        } else {
             return null;
+        }
+    }
+
+    private String IntToStringDecision(int code) {
+        if (code == context.getResources().getInteger(R.integer.ACCEPT)) {
+            return ALLOW;
+        } else {
+            if (code == context.getResources().getInteger(R.integer.DENY)) {
+                return DENY;
+            } else {
+                if (code == context.getResources().getInteger(R.integer.NEGOTIATE)) {
+                    return NEGOTIATE;
+                } else {
+                    return null;
+                }
+            }
         }
     }
 

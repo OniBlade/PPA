@@ -48,7 +48,7 @@ public class Request_Fragment extends Fragment {
     private ObjectAnimator anim;
     private View DialogView;
     private AlertDialog Dialog;
-
+    private boolean isHistory, isInferredMechanism;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -93,12 +93,17 @@ public class Request_Fragment extends Fragment {
         super.onCreate(savedInstanceState);
         database = new DBHelper(getContext());
         if (getArguments() != null) {
+            isHistory = getArguments().getBoolean("history");
             request = database.getRequest(getArguments().getInt("response"));
+            if (isHistory) {
+                isInferredMechanism = getArguments().getBoolean("isInferredMechanism");
+            }
+
         }
     }
 
     private void instantiateComponents(View view) {
-        mProgressBar =  view.findViewById(R.id.circular_progress_bar);
+        mProgressBar = view.findViewById(R.id.circular_progress_bar);
         btn_Concluir = view.findViewById(R.id.btn_Concluir);
         tvRequesting_Number = view.findViewById(R.id.tvRequesting_Number);
         cvConsumidor = view.findViewById(R.id.cvConsumidor);
@@ -112,6 +117,13 @@ public class Request_Fragment extends Fragment {
         item_img_motivo = view.findViewById(R.id.item_img_motivo);
         item_img_dados = view.findViewById(R.id.item_img_dados);
         recyclerView = view.findViewById(R.id.RecyclerViewlist);
+
+        if(isHistory){
+            btn_Concluir.setText("Atualizar Resposta");
+        }else{
+            btn_Concluir.setText("Finalizar Solicitação");
+        }
+
     }
 
 
@@ -123,8 +135,11 @@ public class Request_Fragment extends Fragment {
         instantiateComponents(view);
 
         tvRequesting_Number.setText(request.getRequestId().toString());
-        recyclerView.setAdapter(new Request_Items_Adapter(request, view.getContext()));
-
+        if (!isHistory) {
+            recyclerView.setAdapter(new Request_Items_Adapter(request, view.getContext()));
+        } else {
+            recyclerView.setAdapter(new Request_Items_Adapter(request, view.getContext(), isInferredMechanism));
+        }
         item_img_dados.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
         recyclerView.setVisibility(View.VISIBLE);
 
@@ -133,9 +148,8 @@ public class Request_Fragment extends Fragment {
             public void onClick(View view) {
                 if (checkAllAttributes()) {
                     new FinishTask().execute();
-
                 } else {
-                    Toast.makeText(context, "É necesario responder todos os dados solicitados", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "É necessário responder todos os dados solicitados", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -193,31 +207,32 @@ public class Request_Fragment extends Fragment {
     private void FinalizeRequest() {
         DBHelper database = new DBHelper(context);
         database.updateRequestStatus(request, true);
-        database.saveTraining_set(request);
     }
 
-    private void sendReplyConsumer(){
+    private void sendReplyConsumer() {
         DBHelper database = new DBHelper(context);
         Intent intent = new Intent(context, MQTTService.class);
         Bundle mBundle2 = new Bundle();
         mBundle2.putInt("CODE", PUBLISH);
         mBundle2.putString("reply", database.getConsumerResponse(request));
-        mBundle2.putString("topic",request.getUuid());
+        mBundle2.putString("topic", request.getUuid());
         intent.putExtras(mBundle2);
         context.startService(intent);
     }
 
-
-
     private boolean checkAllAttributes() {
-        updateRequest();
         boolean flag = false;
-        if (request.getUserDecisionId().getUserDecisionId() != 0) {
-            if (request.getUserDecisionId().getUserDecisionAttributesList().size() == request.getDataId().getDataAttributesList().size()) {
-                flag = true;
-            } else {
-                flag = false;
+        if (!isHistory) {
+            updateRequest();
+            if (request.getUserDecisionId().getUserDecisionId() != 0) {
+                if (request.getUserDecisionId().getUserDecisionAttributesList().size() == request.getDataId().getDataAttributesList().size()) {
+                    flag = true;
+                } else {
+                    flag = false;
+                }
             }
+        }else{
+            flag =true;
         }
         return flag;
     }
@@ -235,8 +250,7 @@ public class Request_Fragment extends Fragment {
         return string_return;
     }
 
-
-    private void fragmentJump() {
+    private void fragmentJumpRequestList() {
         Request_List_Fragment mFragment = new Request_List_Fragment();
         Bundle mBundle = new Bundle();
         mFragment.setArguments(mBundle);
@@ -263,6 +277,14 @@ public class Request_Fragment extends Fragment {
         }
     }
 
+    private void fragmentJumpHistoryList() {
+        History_List_Fragment mFragment = new History_List_Fragment();
+        Bundle mBundle = new Bundle();
+        mBundle.putInt("CODE", (isInferredMechanism)? 0:1);
+        mFragment.setArguments(mBundle);
+        switchContent(R.id.content_main, mFragment);
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -285,11 +307,17 @@ public class Request_Fragment extends Fragment {
 
         @Override
         protected String doInBackground(String... urls) {
-            FinalizeRequest();
-            sendReplyConsumer();
             MLP mlp = new MLP(context);
-            mlp.RetrainMLP();
-            fragmentJump();
+
+            if (!isHistory) {
+                FinalizeRequest();
+                sendReplyConsumer();
+                mlp.RetrainMLP();
+                fragmentJumpRequestList();
+            } else {
+                mlp.RetrainMLP();
+                fragmentJumpHistoryList();
+            }
             return "";
         }
 
@@ -299,6 +327,7 @@ public class Request_Fragment extends Fragment {
             Toast.makeText(context, "Finalizado com sucesso!!!", Toast.LENGTH_LONG).show();
         }
     }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

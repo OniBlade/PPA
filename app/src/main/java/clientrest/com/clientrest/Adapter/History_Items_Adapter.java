@@ -2,6 +2,8 @@ package clientrest.com.clientrest.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +11,14 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import clientrest.com.clientrest.Activity.MainActivity;
 import clientrest.com.clientrest.DataBase.Entity.HistoryObject;
+import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.Frament.History_List_Fragment.OnListFragmentInteractionListener;
 
 import java.util.List;
 
+import clientrest.com.clientrest.Frament.Request_Fragment;
 import clientrest.com.clientrest.R;
 
 /**
@@ -66,7 +71,8 @@ public class History_Items_Adapter extends RecyclerView.Adapter<History_Items_Ad
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        final int pos = position;
         RepaintItemView(holder, position);
         holder.tvConsumer.setText("Solicitante: " + mValues.get(position).getConsumer_attribute() + " " + mValues.get(position).getConsumer_value());
         holder.tvReason.setText("Motivo: " + mValues.get(position).getRequest_reason());
@@ -81,9 +87,7 @@ public class History_Items_Adapter extends RecyclerView.Adapter<History_Items_Ad
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    /// mListener.onListFragmentInteraction(holder.mItem);
+                    fragmentJump(mValues.get(pos).getRequestId());
                 }
             }
         });
@@ -107,6 +111,26 @@ public class History_Items_Adapter extends RecyclerView.Adapter<History_Items_Ad
                 }
             }
         } catch (IndexOutOfBoundsException c) {
+        }
+    }
+
+    private void fragmentJump(int request_id) {
+        Request_Fragment mFragment = new Request_Fragment();
+        Bundle mBundle = new Bundle();
+        mBundle.putInt("response", request_id);
+        mBundle.putBoolean("history", true);
+        mBundle.putBoolean("isInferredMechanism", isInferredMechanism);
+
+        mFragment.setArguments(mBundle);
+        switchContent(R.id.content_main, mFragment);
+    }
+
+    public void switchContent(int id, Fragment fragment) {
+        if (context == null)
+            return;
+        if (context instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity) context;
+            mainActivity.switchContent(id, fragment, "NotificationFrament");
         }
     }
 

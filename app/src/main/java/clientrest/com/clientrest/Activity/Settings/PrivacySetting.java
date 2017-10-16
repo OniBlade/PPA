@@ -1,13 +1,8 @@
 package clientrest.com.clientrest.Activity.Settings;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -27,7 +22,7 @@ public class PrivacySetting extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.privacy_config);
+        setContentView(R.layout.privacy_settings);
 
         database = new DBHelper(getBaseContext());
         settings = database.getLastPrivacySettings();

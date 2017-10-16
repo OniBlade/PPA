@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -33,11 +34,10 @@
         <receiver
             android:name=".Broadcast.Broadcast"
             android:enabled="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
             android:exported="false">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="BROADCAST_RECEIVER_XML" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
@@ -45,21 +45,24 @@
             android:name=".Service.MQTTService"
             android:enabled="true"
             android:exported="false">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
+            <!--    <intent-filter>
+                   <category android:name="android.intent.category.DEFAULT" />
 
-                <action android:name="MQTTService" />
-            </intent-filter>
+                   <action android:name="MQTTService" />
+               </intent-filter>-->
         </service>
 
         <activity android:name=".Activity.Settings.PrivacySetting" />
         <activity android:name=".Activity.Settings.NotificationSettings" />
         <activity android:name=".Activity.Settings.MQTTSettings" />
+        <activity android:name=".Activity.Settings.HelpSettings" />
+        <activity android:name=".Activity.Settings.DBSettings"></activity>
+
         <activity
             android:name=".Activity.SettingsActivity"
             android:label="@string/title_activity_settings_"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Activity.Settings.HelpSettings"></activity>
+
     </application>
 
 </manifest>

@@ -36,7 +36,7 @@
                 android:layout_weight="1"
                 android:paddingLeft="16dp"
                 android:paddingTop="16dp"
-                android:text="Ajuda"
+                android:text="Conexão DataBase"
                 android:textColor="@android:color/background_light"
                 android:textSize="20sp" />
         </LinearLayout>

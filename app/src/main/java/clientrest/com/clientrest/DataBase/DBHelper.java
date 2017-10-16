@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.Set;
 
@@ -267,6 +268,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DataBase_insert("data_attributes", null, contentValues);
     }
 
+
     public Data getData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DataAttributes> dataAttributesList = new ArrayList<>();
@@ -283,6 +285,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 dataAttributes.setShared(res.getInt(3));
                 dataAttributes.setDataAttributesId(res.getInt(4));
                 dataAttributes.setRetention(res.getString(5));
+                dataAttributes.setTrainingSetId(res.getInt(6));
                 dataAttributesList.add(dataAttributes);
                 res.moveToNext();
             }
@@ -342,6 +345,7 @@ public class DBHelper extends SQLiteOpenHelper {
         UserDecision userDecision = new UserDecision();
 
         if (request.getUserDecisionId().getUserDecisionId() == 0) {
+            Log.e("TAG", "getUserDecisionId() == 0 ::: entrei");
             userDecision = new UserDecision();
             contentValues.clear();
             contentValues.put("user_decision_id", (byte[]) null);
@@ -361,7 +365,9 @@ public class DBHelper extends SQLiteOpenHelper {
             contentValues.put("user_decision_id", userDecision.getUserDecisionId());
             DataBase_update("request", contentValues, "request_id = ? ", new String[]{Integer.toString(request.getRequestId())});
 
+
         } else {
+            Log.e("TAG", "getUserDecisionId() == 0 ::: entrei no else");
             userDecision.setUserDecisionId(request.getUserDecisionId().getUserDecisionId());
             boolean flag = true;
             for (int i = 0; i < request.getUserDecisionId().getUserDecisionAttributesList().size(); i++) {
@@ -376,6 +382,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     contentValues.put("state", decision);
                     contentValues.put("user_decision_id", userDecision.getUserDecisionId());
                     DataBase_update("user_decision_attributes", contentValues, "user_decision_attributes_id = ? ", new String[]{Integer.toString(request.getUserDecisionId().getUserDecisionAttributesList().get(i).getUserDecisionAttributesId())});
+                    //         Log.e("TAG", "" + request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getTrainingSetId());
+                    //          saveTraining_set(request, request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId(), decision, true);
                 }
             }
             if (flag) {
@@ -390,6 +398,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 DataBase_insert("user_decision_attributes", null, contentValues);
             }
         }
+
+        saveTraining_set(request, dataAttributes, decision);
 
     }
 
@@ -513,19 +523,20 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             res = db.rawQuery("select * from request where request_id=" + id, null);
             res.moveToFirst();
+            if (res.getCount() > 0) {
 
-            request.setInferredDecisionId(getInferredDecision(res.getInt(0)));
-            request.setUuid(res.getString(1));
-            request.setUserDecisionId(getUserDecision(res.getInt(2)));
-            request.setDataId(getData(res.getInt(3)));
-            request.setReason(res.getString(4));
-            request.setConsumerId(getConsumer(res.getInt(5)));
-            request.setState(res.getInt(6));
-            request.setLocation(res.getString(7));
-            request.setRequestId(res.getInt(8));
-            request.setCheckUser(res.getInt(9));
-            request.setUserBenefit(res.getString(10));
-
+                request.setInferredDecisionId(getInferredDecision(res.getInt(0)));
+                request.setUuid(res.getString(1));
+                request.setUserDecisionId(getUserDecision(res.getInt(2)));
+                request.setDataId(getData(res.getInt(3)));
+                request.setReason(res.getString(4));
+                request.setConsumerId(getConsumer(res.getInt(5)));
+                request.setState(res.getInt(6));
+                request.setLocation(res.getString(7));
+                request.setRequestId(res.getInt(8));
+                request.setCheckUser(res.getInt(9));
+                request.setUserBenefit(res.getString(10));
+            }
         } finally {
             if (res != null) {
                 res.close();
@@ -597,6 +608,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 dataAttributes.setShared(res.getInt(3));
                 dataAttributes.setDataAttributesId(res.getInt(4));
                 dataAttributes.setRetention(res.getString(5));
+                dataAttributes.setTrainingSetId(res.getInt(6));
                 res.moveToNext();
             }
         } finally {
@@ -726,7 +738,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "consumer_attributes.value, \n" +
                 "request.reason, \n" +
                 "data_attributes.attribute,\n" +
-                "user_decision_attributes.state\n" +
+                "user_decision_attributes.state,\n" +
+                "request.request_id\n" +
                 "from data_attributes \n" +
                 "JOIN data ON data.data_id = data_attributes.data_id\n" +
                 "JOIN request ON request.data_id =  data.data_id\n" +
@@ -734,7 +747,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "join consumer_attributes on consumer.consumer_id = consumer_attributes.consumer_id\n" +
                 "JOIN user_decision on user_decision.user_decision_id = request.user_decision_id\n" +
                 "JOIN user_decision_attributes on user_decision_attributes.data_attribute_id = data_attributes.data_attributes_id\n" +
-                "where request.state=1 and request.check_user=1";
+                "where request.state=1 and data_attributes.training_set_id is not null";
         Cursor res = null;
         try {
             res = db.rawQuery(sql, null);
@@ -747,6 +760,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 historyObject.setRequest_reason(res.getString(3));
                 historyObject.setData_attributes_attribute(res.getString(4));
                 historyObject.setInferred_decision_attributes_state(res.getInt(5));
+                historyObject.setRequestId(res.getInt(6));
                 historyObjectArrayList.add(historyObject);
                 res.moveToNext();
             }
@@ -769,7 +783,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "request.reason, \n" +
                 "data_attributes.attribute,\n" +
                 "inferred_decision_attributes.state, \n" +
-                "inferred_decision_attributes.trust_level\n" +
+                "inferred_decision_attributes.trust_level,\n" +
+                "request.request_id\n" +
                 "from data_attributes \n" +
                 "JOIN data ON data.data_id = data_attributes.data_id\n" +
                 "JOIN request ON request.data_id =  data.data_id\n" +
@@ -778,7 +793,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "JOIN inferred_decision on inferred_decision.inferred_decision_id = request.inferred_decision_id\n" +
                 "JOIN inferred_decision_attributes on inferred_decision_attributes.inferred_decision_id =  inferred_decision.inferred_decision_id and \n" +
                 "inferred_decision_attributes.data_attributes_id=data_attributes.data_attributes_id\n" +
-                "where request.state=1 and request.check_user=0";
+                "where request.state=1 and data_attributes.training_set_id is null";
 
         Cursor res = null;
         try {
@@ -793,6 +808,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 historyObject.setData_attributes_attribute(res.getString(4));
                 historyObject.setInferred_decision_attributes_state(res.getInt(5));
                 historyObject.setInferred_decision_attributes_trust_level(res.getDouble(6));
+                historyObject.setRequestId(res.getInt(7));
                 historyObjectArrayList.add(historyObject);
                 res.moveToNext();
             }
@@ -863,21 +879,28 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void saveTraining_set(Request request) {
+    public void saveTraining_set(Request request, DataAttributes dataAttributes, int decision) {
         ContentValues contentValues = new ContentValues();
-        for (int i = 0; i < request.getUserDecisionId().getUserDecisionAttributesList().size(); i++) {
-            contentValues.put("device_type", request.getConsumerId().getConsumerId());
-            contentValues.put("data_type", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getAttribute());
-            contentValues.put("user_benefit", request.getUserBenefit());
-            contentValues.put("retention", request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getRetention());
-            contentValues.put("location", request.getLocation());
-            contentValues.put("shared", getStringParam(request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getShared()));
-            contentValues.put("inferred", getStringParam(request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getInferred()));
-            contentValues.put("result", getResultStringParam(request.getUserDecisionId().getUserDecisionAttributesList().get(i).getState()));
-            DataBase_insert("training_set", null, contentValues);
-            contentValues.clear();
-        }
+        dataAttributes = getDataAttributesForId(dataAttributes.getDataAttributesId());
 
+        contentValues.put("device_type", request.getConsumerId().getConsumerId());
+        contentValues.put("location", request.getLocation());
+        contentValues.put("user_benefit", request.getUserBenefit());
+        contentValues.put("data_type", dataAttributes.getAttribute());
+        contentValues.put("retention", dataAttributes.getRetention());
+        contentValues.put("shared", getStringParam(dataAttributes.getShared()));
+        contentValues.put("inferred", getStringParam(dataAttributes.getInferred()));
+        contentValues.put("result", getResultStringParam(decision));
+
+        if (dataAttributes.getTrainingSetId() == 0) {
+            int id = DataBase_insert("training_set", null, contentValues);
+            contentValues.clear();
+            contentValues.put("training_set_id", id);
+            DataBase_update("data_attributes", contentValues, "data_attributes_id = ? ", new String[]{Integer.toString(dataAttributes.getDataAttributesId())});
+
+        } else {
+            DataBase_update("training_set", contentValues, "training_set_id = ? ", new String[]{Integer.toString(dataAttributes.getTrainingSetId())});
+        }
     }
 
     private String getStringParam(int shared) {
@@ -1114,7 +1137,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor res = null;
         try {
             res = db.rawQuery("select * from things where attribute = \"" + attribute + "\"", null);
-            res.moveToFirst();
+            res.moveToLast();
             return res.getString(2);
         } finally {
             if (res != null) {
@@ -1196,5 +1219,39 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put("notify_new_consumer", settings.getNotifyNewConsumer());
         contentValues.put("sound_notification", settings.getSoundNotification());
         DataBase_insert("settings", null, contentValues);
+    }
+
+    public void updateTrainingSetForDataAttribute(Request request, boolean isInferredMechanism) {
+        ContentValues contentValues = new ContentValues();
+        if (!isInferredMechanism) {  // usuario que respondeu
+            for (int i = 0; i < request.getUserDecisionId().getUserDecisionAttributesList().size(); i++) {
+                contentValues.put("result", getResultStringParam(request.getUserDecisionId().getUserDecisionAttributesList().get(i).getState()));
+                DataBase_update("training_set", contentValues, "training_set_id = ? ", new String[]{Integer.toString(request.getUserDecisionId().getUserDecisionAttributesList().get(i).getDataAtttributeId().getDataAttributesId())});
+            }
+        }
+    }
+
+    public void saveOrUpdateTraining(Request request, InferredDecisionAttributes inferredDecisionAttributes) {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put("device_type", request.getConsumerId().getConsumerId());
+        contentValues.put("location", request.getLocation());
+        contentValues.put("user_benefit", request.getUserBenefit());
+        contentValues.put("data_type", inferredDecisionAttributes.getDataAttributes().getAttribute());
+        contentValues.put("retention", inferredDecisionAttributes.getDataAttributes().getRetention());
+        contentValues.put("shared", getStringParam(inferredDecisionAttributes.getDataAttributes().getShared()));
+        contentValues.put("inferred", getStringParam(inferredDecisionAttributes.getDataAttributes().getInferred()));
+        contentValues.put("result", getResultStringParam(inferredDecisionAttributes.getState()));
+
+        if (inferredDecisionAttributes.getDataAttributes().getTrainingSetId() != null) {
+            DataBase_update("training_set", contentValues, "training_set_id = ? ", new String[]{Integer.toString(inferredDecisionAttributes.getDataAttributes().getTrainingSetId())});
+        } else {
+            int id = DataBase_insert("training_set", null, contentValues);
+            contentValues.clear();
+
+            contentValues.put("training_set_id", id);
+            DataBase_update("data_attributes", contentValues, "data_attributes_id = ? ", new String[]{Integer.toString(inferredDecisionAttributes.getDataAttributes().getDataAttributesId())});
+
+        }
     }
 }

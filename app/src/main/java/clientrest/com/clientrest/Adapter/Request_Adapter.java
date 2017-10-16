@@ -31,6 +31,8 @@ public class Request_Adapter extends RecyclerView.Adapter<Request_Adapter.ViewHo
     public Request_Adapter(List<Request> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -43,8 +45,8 @@ public class Request_Adapter extends RecyclerView.Adapter<Request_Adapter.ViewHo
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            tvPedido =  itemView.findViewById(R.id.tvAtributo);
-            tvSolicitante =  itemView.findViewById(R.id.tvsolicitante);
+            tvPedido = itemView.findViewById(R.id.tvAtributo);
+            tvSolicitante = itemView.findViewById(R.id.tvsolicitante);
             tvMotivo = itemView.findViewById(R.id.tvMotivo);
             tvNumPedido = itemView.findViewById(R.id.tvNumPedido);
         }
@@ -67,8 +69,8 @@ public class Request_Adapter extends RecyclerView.Adapter<Request_Adapter.ViewHo
 
         holder.tvPedido.setText("N° Pedido:");
         holder.tvNumPedido.setText(mValues.get(position).getRequestId().toString());
-        holder.tvSolicitante.setText("Solicitante: "+(mValues.get(position).getConsumerId().getConsumerAttributesList().get(0).getValue()));
-        holder.tvMotivo.setText("Motivo: "+mValues.get(position).getReason());
+        holder.tvSolicitante.setText("Solicitante: " + (mValues.get(position).getConsumerId().getConsumerAttributesList().get(0).getValue()));
+        holder.tvMotivo.setText("Motivo: " + mValues.get(position).getReason());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +87,7 @@ public class Request_Adapter extends RecyclerView.Adapter<Request_Adapter.ViewHo
         Request_Fragment mFragment = new Request_Fragment();
         Bundle mBundle = new Bundle();
         mBundle.putInt("response", request.getRequestId());
+        mBundle.putBoolean("history", false);
         mFragment.setArguments(mBundle);
         switchContent(R.id.content_main, mFragment);
     }
