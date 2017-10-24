@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/list"
-    android:name="clientrest.com.clientrest.NotificationFragment"
+    android:name="clientrest.com.clientrest.Frament.History_List_Fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
-    android:background="@drawable/background"
     app:layoutManager="LinearLayoutManager"
-    tools:context="clientrest.com.clientrest.Frament.Request_List_Fragment"
-    tools:listitem="@layout/request_items_list">
-
-
-</android.support.v7.widget.RecyclerView>
+    tools:context="clientrest.com.clientrest.Frament.History_List_Fragment"
+    tools:listitem="@layout/fragment_history" />

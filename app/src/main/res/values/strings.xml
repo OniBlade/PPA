@@ -51,6 +51,7 @@
     `user_decision_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `user_decision_id`	integer NOT NULL,
     `data_attribute_id`	integer NOT NULL,
+    `anonymised_information` varchar ( 45 ),
     FOREIGN KEY(`user_decision_id`) REFERENCES `user_decision`(`user_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`data_attribute_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>
@@ -69,6 +70,7 @@
     `request_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `check_user`	integer,
     `user_benefit`	varchar ( 45 ),
+     `anonymised_information` varchar ( 45 ),
     FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`consumer_id`) REFERENCES `consumer`(`consumer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`user_decision_id`) REFERENCES `user_decision`(`user_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -79,6 +81,8 @@
     `inferred_decision_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `trust_level`	varchar,
     `inferred_decision_id`	integer NOT NULL,
+     `state` integer,
+        `anonymised_information` varchar,
     FOREIGN KEY(`data_attributes_id`) REFERENCES `data_attributes`(`data_attributes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(`inferred_decision_id`) REFERENCES `inferred_decision`(`inferred_decision_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>
@@ -92,7 +96,9 @@
     `shared`	integer,
     `data_attributes_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `retention`	varchar ( 45 ),
-    FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+     `training_set_id`integer,
+    FOREIGN KEY(`data_id`) REFERENCES `data`(`data_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (`training_set_id`)  REFERENCES `training_set` (`training_set_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );</string>
     <string name="data">CREATE TABLE IF NOT EXISTS `data` (
     `data_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
@@ -125,6 +131,33 @@
         `template_header` TEXT);
     </string>
 
+    <string name="things">
+        CREATE TABLE IF NOT EXISTS `things` (
+  `things_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `attribute` VARCHAR(45) ,
+  `value` VARCHAR(45));
+    </string>
+
+    <string name="configuration">
+        CREATE TABLE IF NOT EXISTS `settings` (
+  `configuration_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `confidence_level`integer ,
+  `always_notify` integer ,
+  `notify_new_consumer` integer ,
+  `sound_notification` integer,
+        `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP )
+    </string>
+    <string name="training_scenarios">CREATE TABLE IF NOT EXISTS `training_scenarios` (
+  `training_scenarios_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `scenario` VARCHAR(255),
+  `state` INTEGER,
+        `decision` INTEGER);</string>
+
+    <string name="scenario1">insert into training_scenarios(scenario,state) values(\"1- Um posto de gasolina quer os dados do seu carro para manter um histórico de abastecimento. Os dados coletados não será compartilhados com terceiros e será mantido pelo posto até achar necessario. \",0);</string>
+    <string name="scenario2">insert into training_scenarios(scenario,state) values(\"2- Um posto de gasolina quer os dados do seu carro para manter um histórico de abastecimento. Os dados coletados não será compartilhados com terceiros e será mantido pelo posto até achar necessario. \",0);</string>
+    <string name="scenario3">insert into training_scenarios(scenario,state) values(\"3- Um posto de gasolina quer os dados do seu carro para manter um histórico de abastecimento. Os dados coletados não será compartilhados com terceiros e será mantido pelo posto até achar necessario. \",0);</string>
+
+    <string name="privacy_setting_pattern">insert into settings(confidence_level,always_notify,notify_new_consumer,sound_notification) values (95, 1,0,1); </string>
 
     <string name="conjunto_teste1"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"nome\",\"user\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
     <string name="conjunto_teste2"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 1,\"data_nascimento\",\"consumer\",\"satisfied_purpose\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
@@ -189,6 +222,85 @@
     <string name="conjunto_teste61"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 23,\"dados_bancarios\",\"user_consumer\",\"forever\",\"semi_public\",\"no\",\"no\",\"allow\"); </string>
     <string name="conjunto_teste62"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 23,\"agenda\",\"user\",\"forever\",\"your_place\",\"no\",\"no\",\"allow\"); </string>
     <string name="conjunto_teste63"> insert into training_set(\"device_type\", \"data_type\",\"user_benefit\",\"retention\",\"location\",\"shared\",\"inferred\",\"result\") values( 24,\"cor_da_bosta\",\"consumer\",\"satisfied_purpose\",\"someone_else_place\",\"no\",\"no\",\"deny\"); </string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_main34">MainActivity34</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_settings_">Settings_Activity</string>
 
 
 </resources>

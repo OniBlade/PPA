@@ -22,15 +22,39 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_RecyclerViewAdapter.ViewHolder> {
+public class Request_Adapter extends RecyclerView.Adapter<Request_Adapter.ViewHolder> {
 
     private final List<Request> mValues;
     private final OnListFragmentInteractionListener mListener;
     private Context context;
 
-    public Request_RecyclerViewAdapter(List<Request> items, OnListFragmentInteractionListener listener) {
+    public Request_Adapter(List<Request> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+
+
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView tvPedido;
+        public final TextView tvSolicitante;
+        public final TextView tvMotivo;
+        public final TextView tvNumPedido;
+
+        public ViewHolder(View view) {
+            super(view);
+            mView = view;
+            tvPedido = itemView.findViewById(R.id.tvAtributo);
+            tvSolicitante = itemView.findViewById(R.id.tvsolicitante);
+            tvMotivo = itemView.findViewById(R.id.tvMotivo);
+            tvNumPedido = itemView.findViewById(R.id.tvNumPedido);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " '" + tvSolicitante.getText() + "'";
+        }
     }
 
     @Override
@@ -45,14 +69,13 @@ public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Re
 
         holder.tvPedido.setText("N° Pedido:");
         holder.tvNumPedido.setText(mValues.get(position).getRequestId().toString());
-        holder.tvSolicitante.setText((mValues.get(position).getConsumerId().getConsumerAttributesList().get(0).getValue()));
-        holder.tvMotivo.setText(mValues.get(position).getReason());
+        holder.tvSolicitante.setText("Solicitante: " + (mValues.get(position).getConsumerId().getConsumerAttributesList().get(0).getValue()));
+        holder.tvMotivo.setText("Motivo: " + mValues.get(position).getReason());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    //  mListener.onListFragmentInteraction(holder.mItem);
                     fragmentJump(mValues.get(position));
                 }
 
@@ -64,6 +87,7 @@ public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Re
         Request_Fragment mFragment = new Request_Fragment();
         Bundle mBundle = new Bundle();
         mBundle.putInt("response", request.getRequestId());
+        mBundle.putBoolean("history", false);
         mFragment.setArguments(mBundle);
         switchContent(R.id.content_main, mFragment);
     }
@@ -77,31 +101,10 @@ public class Request_RecyclerViewAdapter extends RecyclerView.Adapter<Request_Re
         }
     }
 
-
     @Override
     public int getItemCount() {
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView tvPedido;
-        public final TextView tvSolicitante;
-        public final TextView tvMotivo;
-        public final TextView tvNumPedido;
 
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            tvPedido =  itemView.findViewById(R.id.tvAtributo);
-            tvSolicitante =  itemView.findViewById(R.id.tvsolicitante);
-            tvMotivo = itemView.findViewById(R.id.tvMotivo);
-            tvNumPedido = itemView.findViewById(R.id.tvNumPedido);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + tvSolicitante.getText() + "'";
-        }
-    }
 }

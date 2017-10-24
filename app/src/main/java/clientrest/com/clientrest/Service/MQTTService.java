@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -20,31 +19,25 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import clientrest.com.clientrest.*;
 import clientrest.com.clientrest.Activity.MainActivity;
-import clientrest.com.clientrest.DataBase.Controller.Request_Controller;
+import clientrest.com.clientrest.Agents.AnalyzeData;
+import clientrest.com.clientrest.Agents.Negotiator;
 import clientrest.com.clientrest.DataBase.DBHelper;
-
+import clientrest.com.clientrest.DataBase.Entity.Settings;
+import clientrest.com.clientrest.R;
 public class MQTTService extends Service {
 
-
     private static String broker = "tcp://m13.cloudmqtt.com:19314";
-    private static String password = "consumer";
-    private static String userName = "consumer";
-    private static String topic = "Solicitar";
-    private static String content = "Solicitação Teste";
-    private static String clientId = "";
     private static Context context;
-    private Request_Controller request_controller;
     private static int TRAIN_MLP = 1;
     private static int SAVE_NEW_REQUEST = 2;
     private static int PROCESSING_REQUESTS = 3;
+    private static int PUBLISH = 4;
+    private static int NEGOTIATOR_ANSWER = 5;
     MemoryPersistence persistence;
     MqttClient mqttClient;
 
@@ -53,11 +46,10 @@ public class MQTTService extends Service {
 
     @Override
     public void onCreate() {
+        Log.e("MQTT", "onCreate");
         super.onCreate();
         context = getApplicationContext();
-        subscribe();
-        request_controller = new Request_Controller(context);
-
+        Subscribe();
     }
 
     @Override
@@ -72,56 +64,95 @@ public class MQTTService extends Service {
             int codeId = intent.getExtras().getInt("CODE");
             if (codeId == TRAIN_MLP) {
                 new Training_MultilayerPerceptron().execute();
-            } else {
-                if (codeId == SAVE_NEW_REQUEST) {
-                    new SaveRequest().execute(intent.getExtras().getString("request"));
-                } else {
-                    if (codeId == PROCESSING_REQUESTS) {
-                        new ProcessRequest(context);
-                    }
-                }
+            } else if (codeId == SAVE_NEW_REQUEST) {
+                new SaveRequest().execute(intent.getExtras().getString("request"));
+            } else if (codeId == PROCESSING_REQUESTS) {
+                new AnalyzeData(context);
+            } else if (codeId == PUBLISH) {
+                new sendInformationConsumer().execute(intent.getExtras().getString("topic"), intent.getExtras().getString("reply"));
+            } else if (codeId == NEGOTIATOR_ANSWER) {
+                new Negotiator(context, intent.getExtras().getString("ANSWER"));
             }
-
         }
         return (super.onStartCommand(intent, flags, startId));
     }
 
-    private void subscribe() {
-        persistence = new MemoryPersistence();
+
+    private void Publish(String topic, String content) {
+        String clientId = MqttClient.generateClientId();
+        MemoryPersistence persistence = new MemoryPersistence();
         try {
-            mqttClient = new MqttClient(broker, clientId, persistence);
+            MqttClient mqttClient = new MqttClient(broker, clientId, persistence);
             mqttClient.setCallback(new MqttCallback() {
-                public void messageArrived(String topic, MqttMessage msg) throws Exception {
-                    Log.i("MQTTService", "messageArrived");
-                    Intent it = new Intent(context, MQTTService.class);
-                    Bundle mBundle = new Bundle();
-                    mBundle.putInt("CODE", SAVE_NEW_REQUEST);
-                    mBundle.putString("request", msg.toString());
-                    it.putExtras(mBundle);
-                    startService(it);
+                public void messageArrived(String topic, MqttMessage msg)
+                        throws Exception {
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken arg0) {
-                    Log.i("MQTTService", "deliveryComplete");
                 }
 
                 public void connectionLost(Throwable arg0) {
-                    Log.i("MQTTService", "connectionLost");
-                    subscribe();
+                    // TODO Auto-generated method stub
                 }
             });
 
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
-            connOpts.setUserName(userName);
-            connOpts.setPassword(password.toCharArray());
+            connOpts.setUserName("user");
+            connOpts.setPassword("user".toCharArray());
             mqttClient.connect(connOpts);
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(1);
-            mqttClient.subscribe(topic, 1);
-
+            mqttClient.publish(topic, message);
+            mqttClient.disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    private void Subscribe() {
+        persistence = new MemoryPersistence();
+        try {
+            mqttClient = new MqttClient(broker, "134679", persistence);
+            mqttClient.setCallback(new MqttCallback() {
+                public void messageArrived(String topic, MqttMessage msg) throws Exception {
+
+                    Intent intent = new Intent(context, MQTTService.class);
+                    Bundle mBundle = new Bundle();
+                    mBundle.putInt("CODE", SAVE_NEW_REQUEST);
+                    mBundle.putString("request", msg.toString());
+                    intent.putExtras(mBundle);
+                    startService(intent);
+                }
+
+                public void deliveryComplete(IMqttDeliveryToken arg0) {
+                }
+
+                public void connectionLost(Throwable arg0) {
+                    Subscribe();
+                }
+            });
+
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+            connOpts.setUserName("user");
+            connOpts.setPassword("user".toCharArray());
+            mqttClient.connect(connOpts);
+            MqttMessage message = new MqttMessage("".getBytes());
+            message.setQos(1);
+            mqttClient.subscribe("request", 1);
+
+        } catch (MqttException e) {
+            Log.e("MQTT first Catch",e.getMessage());
+
+            try {
+                mqttClient.disconnect();
+                Subscribe();
+            } catch (MqttException e1) {
+               Log.e("MQTT disconect",e1.getMessage());
+            }
+
         }
     }
 
@@ -139,15 +170,14 @@ public class MQTTService extends Service {
         } catch (JSONException e) {
             Log.i("MQTTService", "GenerateReturnPort" + e.toString());
         }
-
     }
 
     private void CreateACLByUser(String str) {
+        HttpURLConnection con = null;
         try {
             String stringUrl = "http://api.cloudmqtt.com/acl";
-
             URL myurl = new URL(stringUrl);
-            HttpURLConnection con = (HttpURLConnection) myurl.openConnection();
+            con = (HttpURLConnection) myurl.openConnection();
             con.setDoOutput(true);
             con.setDoInput(true);
 
@@ -159,7 +189,6 @@ public class MQTTService extends Service {
             os.write(str.getBytes());
             os.close();
 
-            StringBuilder sb = new StringBuilder();
             int HttpResult = con.getResponseCode();
             if (HttpResult == 204) {
                 Log.i("MQTTService", "Porta criado com sucesso!");
@@ -169,6 +198,8 @@ public class MQTTService extends Service {
             }
         } catch (IOException ex) {
             Log.i("MQTTService", "HttpURLConnection ERROR:" + ex.toString());
+        } finally {
+            con.disconnect();
         }
     }
 
@@ -190,31 +221,75 @@ public class MQTTService extends Service {
             boolean ret = false;
             if (!CheckRequest(param[0])) {
                 GenerateReturnPort(param[0]);
-                request_controller.saveRequest(param[0]);
-                Intent it = new Intent(context, MQTTService.class);
+                DBHelper database = new DBHelper(context);
+                checksAndSendsNotification(database, param[0]);
+
+                database.saveRequestJson(param[0]);
+
+                Intent intent = new Intent(context, MQTTService.class);
                 Bundle mBundle = new Bundle();
                 mBundle.putInt("CODE", PROCESSING_REQUESTS);
-                it.putExtras(mBundle);
-                startService(it);
+                intent.putExtras(mBundle);
+                startService(intent);
+
             } else {
-                Log.i("MQTTService", "request Existe");
+                Intent intent = new Intent(context, MQTTService.class);
+                Bundle mBundle = new Bundle();
+                mBundle.putInt("CODE", NEGOTIATOR_ANSWER);
+                mBundle.putString("ANSWER", param[0]);
+                intent.putExtras(mBundle);
+                startService(intent);
+
+                Log.i("MQTTService", "request Existe");//fazer quando ele ja existe
             }
-            showNotification();
+
             return ret;
+        }
+    }
+
+    private void checksAndSendsNotification(DBHelper database, String param) {
+        Settings settings = database.getLastPrivacySettings();
+        Log.e("mqtt", "checksAndSendsNotification");
+        if (settings.getAlwaysNotify() == 1) {
+            showNotification();
+        } else {
+            if (settings.getNotifyNewConsumer() == 1) {
+                try {
+                    JSONObject jsonObject = new JSONObject(param);
+                    if (!database.getExistUUID(jsonObject.getString("uuid"))) {
+                        Log.e("TAG", "vai receber notificação");
+                        showNotification();
+                    }else{
+                        Log.e("TAG", "nao entrou");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     private class Training_MultilayerPerceptron extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(String... param) {
-            new MLP(context);
+            MLP mlp = new MLP(context);
+            mlp.RetrainMLP();
             return null;
         }
+
+    }
+
+    private class sendInformationConsumer extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(String... param) {
+            Publish(param[0], param[1]);
+            return null;
+        }
+
     }
 
     private boolean CheckRequest(String obj) {
         try {
             JSONObject jsonObject = new JSONObject(obj);
-            String request_id = jsonObject.getString("request_id");
+            jsonObject.getString("request_code");
             return true;
         } catch (JSONException e) {
             return false;

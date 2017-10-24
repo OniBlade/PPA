@@ -20,8 +20,17 @@ public class DataAttributes  {
     private Integer inferred;
     private Integer dataId;
     private String user_benefit;
+    private Integer trainingSetId;
 
     public DataAttributes() {
+    }
+
+    public Integer getTrainingSetId() {
+        return trainingSetId;
+    }
+
+    public void setTrainingSetId(Integer trainingSetId) {
+        this.trainingSetId = trainingSetId;
     }
 
     public String getUser_benefit() {

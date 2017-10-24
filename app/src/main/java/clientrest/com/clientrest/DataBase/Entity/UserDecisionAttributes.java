@@ -5,6 +5,8 @@
  */
 package clientrest.com.clientrest.DataBase.Entity;
 
+import android.util.Log;
+
 /**
  * @author Fagner Roger
  */
@@ -16,8 +18,17 @@ public class UserDecisionAttributes {
     private String information;
     private DataAttributes dataAtttributeId;
     private UserDecision userDecisionId;
+    private String anonymised_information;
 
     public UserDecisionAttributes() {
+    }
+
+    public String getAnonymised_information() {
+        return anonymised_information;
+    }
+
+    public void setAnonymised_information(String anonymised_information) {
+        this.anonymised_information = anonymised_information;
     }
 
     public UserDecisionAttributes(Integer userDecisionAttributesId) {
@@ -45,7 +56,11 @@ public class UserDecisionAttributes {
     }
 
     public void setInformation(String information) {
-        this.information = information;
+        if (information != null) {
+            this.information = information;
+        } else {
+            this.information = "";
+        }
     }
 
     public DataAttributes getDataAtttributeId() {
