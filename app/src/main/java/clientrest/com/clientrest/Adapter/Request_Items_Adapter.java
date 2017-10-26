@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
@@ -211,7 +211,7 @@ public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Ad
         tvAtributoResp.setText(mDataset.get(position).getDataAttributes().getAttribute());
         String aux = (mDataset.get(position).getDataAttributes().getShared().equals(1)) ? "Sim" : "Não";
         tvShared.setText(aux);
-        tvLocation.setText(request.getLocation());
+        tvLocation.setText(getStringLocation(request.getLocation()));
         aux = (mDataset.get(position).getDataAttributes().getInferred().equals(1)) ? "Sim" : "Não";
         tvInferred.setText(aux);
         tvRetention.setText(getStringRetention(mDataset.get(position).getDataAttributes().getRetention()));
@@ -250,17 +250,29 @@ public class Request_Items_Adapter extends RecyclerView.Adapter<Request_Items_Ad
         }
     }
 
-    private String getStringRetention(String retention) {
-        if (retention.equals("semi_public")) {
+    private String getStringRetention(String retention){
+        if(retention.equals("forever")){
+            return "Para sempre";
+        }else if(retention.equals("satisfied_purpose")){
+            return "Ate satisfazer o seu propósito";
+        }else{
+            return "";
+        }
+    }
+
+    private String getStringLocation(String location) {
+        if (location.equals("semi_public")) {
             return "Semi público";
-        } else if (retention.equals("public")) {
+        } else if (location.equals("public")) {
             return "Público";
-        } else if (retention.equals("your_place")) {
+        } else if (location.equals("your_place")) {
             return "Seu local";
-        } else if (retention.equals("someone_else_place")) {
+        } else if (location.equals("someone_else_place")) {
             return "Local de outra pessoa";
-        } else {
-            return null;
+        } else if (location.equals("private")) {
+            return "Privacdo";
+        }else{
+            return "";
         }
     }
 

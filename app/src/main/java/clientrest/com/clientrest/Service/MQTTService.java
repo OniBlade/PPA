@@ -26,7 +26,8 @@ import java.net.URL;
 import clientrest.com.clientrest.Activity.MainActivity;
 import clientrest.com.clientrest.Agents.AnalyzeData;
 import clientrest.com.clientrest.Agents.Negotiator;
-import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
+import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.DataBase.Entity.Settings;
 import clientrest.com.clientrest.R;
 public class MQTTService extends Service {
@@ -89,6 +90,8 @@ public class MQTTService extends Service {
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken arg0) {
+                        Log.e("MQTTService","Msg entrega com sucesso!");
+
                 }
 
                 public void connectionLost(Throwable arg0) {
@@ -104,6 +107,9 @@ public class MQTTService extends Service {
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(1);
             mqttClient.publish(topic, message);
+            Log.e("MQTTService",topic);
+            Log.e("MQTTService",message.toString());
+
             mqttClient.disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
@@ -175,7 +181,7 @@ public class MQTTService extends Service {
     private void CreateACLByUser(String str) {
         HttpURLConnection con = null;
         try {
-            String stringUrl = "http://api.cloudmqtt.com/acl";
+            String stringUrl = "https://api.cloudmqtt.com/acl";
             URL myurl = new URL(stringUrl);
             con = (HttpURLConnection) myurl.openConnection();
             con.setDoOutput(true);
@@ -220,11 +226,14 @@ public class MQTTService extends Service {
         protected Boolean doInBackground(String... param) {
             boolean ret = false;
             if (!CheckRequest(param[0])) {
-                GenerateReturnPort(param[0]);
+
                 DBHelper database = new DBHelper(context);
                 checksAndSendsNotification(database, param[0]);
 
-                database.saveRequestJson(param[0]);
+                Request request = database.saveRequestJson(param[0]);
+                if(!database.isExistHeaderMLP(request.getConsumerId())){ //novo consumidor add porta
+                   GenerateReturnPort(param[0]);
+                }
 
                 Intent intent = new Intent(context, MQTTService.class);
                 Bundle mBundle = new Bundle();

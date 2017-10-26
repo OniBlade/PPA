@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+
 import java.util.List;
-import clientrest.com.clientrest.DataBase.DBHelper;
+
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.Service.MLP;
 import clientrest.com.clientrest.Service.MQTTService;
@@ -38,16 +40,18 @@ public class AnalyzeData {
             MLP mlp = null;
             List<Request> requestList = database.getListRequestNotProcessed();
             for (int i = 0; i < requestList.size(); i++) {
-                 for (int j = 0; j < requestList.get(i).getDataId().getDataAttributesList().size(); j++) { //todos atributos
-                     if (thisDataExists(requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) { //verifica se existe no banco de dados
+                for (int j = 0; j < requestList.get(i).getDataId().getDataAttributesList().size(); j++) { //todos atributos
+                    if (thisDataExists(requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) { //verifica se existe no banco de dados
                         if (database.isExistInTrainingSet("data_type", requestList.get(i).getDataId().getDataAttributesList().get(j).getAttribute())) { //verifica se existe na base de treinamento
-                            if(database.isExistHeaderMLP(requestList.get(i).getConsumerId())) {
+                            if (database.isExistHeaderMLP(requestList.get(i).getConsumerId())) {
+                                Log.i(TAG, "Ambos existe na base de treinamento");
                                 mlp = new MLP(context, getTrain_testArff(requestList.get(i), j));
                                 if (database.saveInferred_Decision(requestList.get(i), j, mlp.getPrediction(), true)) {
                                     flag = true;
                                 }
-                                Log.i(TAG, "Ambos existe na base de treinamento");
-                            }else{
+
+                            } else {
+                                Log.i(TAG, "Consumer não consta na base de treinamento");
                                 //treina novamente com a cabeça
                                 mlp = new MLP(context);
                                 mlp.RetrainMLP();
@@ -55,26 +59,23 @@ public class AnalyzeData {
                                 if (database.saveInferred_Decision(requestList.get(i), j, mlp.getPrediction(), true)) {
                                     flag = true;
                                 }
-                                Log.i(TAG, "Consumer não base de treinamento");
                             }
-
                         } else {
-                            flag = database.saveInferred_Decision(requestList.get(i), j, null, false);
                             Log.i(TAG, "não contem na base de treinamento");
+                            flag = database.saveInferred_Decision(requestList.get(i), j, null, false);
                         }
                     } else {
-                        flag = database.saveInferred_Decision(requestList.get(i), j, null, false);
                         Log.i(TAG, "Dado não contem no banco de dados externo");
+                        flag = database.saveInferred_Decision(requestList.get(i), j, null, false);
                     }
                 }
                 if (flag) {
                     Log.i(TAG, "updateCheckUserRequest");
                     database.updateCheckUserRequest(requestList.get(i), true);
-                }else{
+                } else {
                     //não precisa prever
                     database.updateCheckUserRequest(requestList.get(i), false);
-                    database.updateRequestStatus(requestList.get(i),true);
-
+                    database.updateRequestStatus(requestList.get(i), true);
                     sendReplyConsumer(requestList.get(i));
                 }
                 flag = false;
@@ -92,7 +93,7 @@ public class AnalyzeData {
         String delimiter = ",";
         arff.append(request.getConsumerId().getConsumerId() + delimiter);
         arff.append(request.getDataId().getDataAttributesList().get(j).getAttribute() + delimiter);
-        arff.append("user" + delimiter);//request.getDataId().getDataAttributesList().get(j).getUser_benefit()
+        arff.append(request.getUserBenefit() + delimiter);
         arff.append(request.getDataId().getDataAttributesList().get(j).getRetention() + delimiter);
         arff.append(request.getLocation() + delimiter);
         arff.append(getStringParam(request.getDataId().getDataAttributesList().get(j).getShared()) + delimiter);
@@ -107,18 +108,17 @@ public class AnalyzeData {
     }
 
     private String getStringParam(int shared) {
-        return  (shared == 0)?"no":"yes";
+        return (shared == 0) ? "no" : "yes";
     }
 
 
-
-    private void sendReplyConsumer(Request request){
+    private void sendReplyConsumer(Request request) {
         DBHelper database = new DBHelper(context);
         Intent intent = new Intent(context, MQTTService.class);
         Bundle mBundle2 = new Bundle();
         mBundle2.putInt("CODE", PUBLISH);
         mBundle2.putString("reply", database.getConsumerResponse(request));
-        mBundle2.putString("topic",request.getUuid());
+        mBundle2.putString("topic", request.getUuid());
         intent.putExtras(mBundle2);
         context.startService(intent);
     }

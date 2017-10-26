@@ -15,12 +15,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.MultilayerPerceptron;
-import weka.core.Attribute;
-import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
@@ -148,7 +146,7 @@ public class MLP {
         header.append("}\n");
         header.append("@attribute user_benefit {user,consumer,user_consumer}\n");
         header.append("@attribute retention {satisfied_purpose,forever}\n");
-        header.append("@attribute location {semi_public,public,your_place,someone_else_place}\n");
+        header.append("@attribute location {semi_public,public,your_place,someone_else_place, private}\n");
         header.append("@attribute shared {no,yes}\n");
         header.append("@attribute inferred {no,yes}\n");
         header.append("@attribute result {allow,deny,negotiate}\n");
@@ -176,6 +174,10 @@ public class MLP {
             setMlp(model);
             DBHelper database = new DBHelper(context);
             database.saveMLP(model, header);
+
+          /*  Evaluation eval = crossValidate();
+            System.out.println(eval.toSummaryString("\nResults\nn8888", true));
+     		System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " ");*/
 
         } catch (Exception ex) {
             Logger.getLogger(MLP.class.getName()).log(Level.SEVERE, null, ex);

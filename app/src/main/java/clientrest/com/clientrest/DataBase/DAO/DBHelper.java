@@ -1,4 +1,4 @@
-package clientrest.com.clientrest.DataBase;
+package clientrest.com.clientrest.DataBase.DAO;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -27,6 +27,8 @@ import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.Set;
 
+import clientrest.com.clientrest.DataBase.Entity.Address;
+import clientrest.com.clientrest.DataBase.Entity.City;
 import clientrest.com.clientrest.DataBase.Entity.Consumer;
 import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Data;
@@ -37,6 +39,7 @@ import clientrest.com.clientrest.DataBase.Entity.InferredDecisionAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.DataBase.Entity.Scenarios;
 import clientrest.com.clientrest.DataBase.Entity.Settings;
+import clientrest.com.clientrest.DataBase.Entity.State;
 import clientrest.com.clientrest.DataBase.Entity.TrainingSet;
 import clientrest.com.clientrest.DataBase.Entity.UserDecision;
 import clientrest.com.clientrest.DataBase.Entity.UserDecisionAttributes;
@@ -79,12 +82,29 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(myContext.getResources().getString(R.string.configuration));
         db.execSQL(myContext.getResources().getString(R.string.privacy_setting_pattern));
         db.execSQL(myContext.getResources().getString(R.string.training_scenarios));
+        db.execSQL(myContext.getResources().getString(R.string.table_city));
+        db.execSQL(myContext.getResources().getString(R.string.table_state));
+        db.execSQL(myContext.getResources().getString(R.string.table_address));
+
+        db.execSQL(myContext.getResources().getString(R.string.dados_city));
+        db.execSQL(myContext.getResources().getString(R.string.data_adress));
+        db.execSQL(myContext.getResources().getString(R.string.data_state));
+
         db.execSQL(myContext.getResources().getString(R.string.scenario1));
         db.execSQL(myContext.getResources().getString(R.string.scenario2));
         db.execSQL(myContext.getResources().getString(R.string.scenario3));
+        db.execSQL(myContext.getResources().getString(R.string.scenario4));
+        db.execSQL(myContext.getResources().getString(R.string.scenario5));
+        db.execSQL(myContext.getResources().getString(R.string.scenario6));
+        db.execSQL(myContext.getResources().getString(R.string.scenario7));
+        db.execSQL(myContext.getResources().getString(R.string.scenario8));
+        db.execSQL(myContext.getResources().getString(R.string.scenario9));
+        db.execSQL(myContext.getResources().getString(R.string.scenario10));
+        db.execSQL(myContext.getResources().getString(R.string.scenario11));
+        db.execSQL(myContext.getResources().getString(R.string.scenario12));
+        db.execSQL(myContext.getResources().getString(R.string.scenario13));
+        db.execSQL(myContext.getResources().getString(R.string.scenario14));
 
-
-        /*
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste1));
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste2));
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste3));
@@ -99,56 +119,39 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste12));
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste13));
         db.execSQL(myContext.getResources().getString(R.string.conjunto_teste14));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste15));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste16));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste17));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste18));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste19));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste20));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste21));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste22));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste23));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste24));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste25));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste26));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste27));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste28));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste29));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste30));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste31));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste32));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste33));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste34));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste35));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste36));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste37));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste38));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste39));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste40));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste41));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste42));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste43));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste44));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste45));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste46));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste47));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste48));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste49));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste50));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste51));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste52));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste53));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste54));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste55));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste56));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste57));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste58));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste59));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste60));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste61));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste62));
-        db.execSQL(myContext.getResources().getString(R.string.conjunto_teste63));
-*/
+
+
+
+
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario1));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario2));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario3));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario4));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario5));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario6));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario7));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario8));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario9));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario10));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario11));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario12));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario13));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario14));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario15));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario16));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario17));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario18));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario19));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario21));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario22));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario23));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario24));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario25));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario26));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario27));
+        db.execSQL(myContext.getResources().getString(R.string.createConsumerScenario28));
+
+
     }
 
     @Override
@@ -433,6 +436,8 @@ public class DBHelper extends SQLiteOpenHelper {
             if (isPrediction) {
                 contentValues.put("state", StringToIntDecision(prediction[0]));//decision
                 contentValues.put("trust_level", getPercentage(prediction[1]));//trust_level
+                Log.e(TAG, "prediction[0]:" + prediction[0]);
+                Log.e(TAG, "prediction[1]:" + prediction[1]);
             }
             contentValues.put("data_attributes_id", request.getDataId().getDataAttributesList().get(j).getDataAttributesId());
             contentValues.put("inferred_decision_id", inferredDecision.getInferredDecisionId());
@@ -511,7 +516,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return consumer;
     }
 
-    public void saveRequest(Request request) {
+    public Request saveRequest(Request request) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("data_id", request.getDataId().getDataId());
         contentValues.put("consumer_id", request.getConsumerId().getConsumerId());
@@ -519,8 +524,10 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put("location", request.getLocation());
         contentValues.put("reason", request.getReason());
         contentValues.put("uuid", request.getUuid());
-        contentValues.put("user_benefit", "user_consumer");
-        DataBase_insert("request", null, contentValues);
+        Log.e(TAG, "SaveRequest: " + request.getUserBenefit());
+        contentValues.put("user_benefit", request.getUserBenefit());
+        request.setRequestId(DataBase_insert("request", null, contentValues));
+        return request;
     }
 
     public Request getRequest(int id) {
@@ -1062,19 +1069,22 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public void saveRequestJson(String obj) {
+    public Request saveRequestJson(String obj) {
         try {
             Request request = new Request();
             JSONObject jsonObject = new JSONObject(obj);
             request.setLocation(jsonObject.getString("location"));
             request.setReason(jsonObject.getString("reason"));
+            request.setUserBenefit(jsonObject.getString("user_benefit"));
             request.setUuid(jsonObject.getString("uuid"));
             request.setDataId(saveDataJSON(obj));
             request.setConsumerId(saveConsumerJSON(obj));
-            saveRequest(request);
+            request = saveRequest(request);
+            return request;
         } catch (JSONException e) {
             Log.d(TAG, e.getLocalizedMessage());
         }
+        return null;
     }
 
     private Data saveDataJSON(String obj) {
@@ -1274,6 +1284,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 scenarios.setTrainingScenariosId(res.getInt(0));
                 scenarios.setScenario(res.getString(1));
                 scenarios.setState(res.getInt(2));
+                scenarios.setTrainingSetId(res.getInt(4));
                 scenariosList.add(scenarios);
                 res.moveToNext();
             }
@@ -1291,5 +1302,110 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put("state", 1);
         contentValues.put("decision", scenarios.getDecision());
         DataBase_update("training_scenarios", contentValues, "training_scenarios_id = ? ", new String[]{Integer.toString(scenarios.getTrainingScenariosId())});
+
+        Log.e("TAG", "Decisão: " + getResultStringParam(scenarios.getDecision()));
+        Log.e("TAG", "Id training ser: " + scenarios.getTrainingSetId());
+        contentValues.clear();
+        contentValues.put("result", getResultStringParam(scenarios.getDecision()));
+        DataBase_update("training_set", contentValues, "training_set_id = ? ", new String[]{Integer.toString(scenarios.getTrainingSetId())});
+
+    }
+
+    public List<State> getStateList() {
+        List<State> statesList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = null;
+        try {
+            res = db.rawQuery("select * from estado", null);
+            res.moveToFirst();
+            while (!res.isAfterLast()) {
+                State state = new State();
+                state.setCodigo(res.getInt(0));
+                state.setName(res.getString(1));
+                state.setUf(res.getString(2));
+                state.setCountry(res.getString(3));
+                statesList.add(state);
+                res.moveToNext();
+            }
+            return statesList;
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            db.close();
+        }
+    }
+
+    public State getStateForId(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = null;
+        State state;
+        try {
+            res = db.rawQuery("select * from estado where estado.codigo=" + id, null);
+            res.moveToFirst();
+            state = new State();
+            state.setCodigo(res.getInt(0));
+            state.setName(res.getString(1));
+            state.setUf(res.getString(2));
+            state.setCountry(res.getString(3));
+            return state;
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            db.close();
+        }
+    }
+
+    public List<City> getCityList() {
+        List<City> cidadesList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = null;
+        try {
+            res = db.rawQuery("select * from cidade", null);
+            res.moveToFirst();
+            while (!res.isAfterLast()) {
+                City city = new City();
+                city.setCodigo(res.getInt(0));
+                city.setName(res.getString(1));
+                city.setIdState(res.getInt(2));
+                city.setState(getStateForId(city.getIdState()));
+                cidadesList.add(city);
+                res.moveToNext();
+            }
+            return cidadesList;
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            db.close();
+        }
+    }
+
+
+    public List<Address> getAddressList() {
+        List<Address> addressList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = null;
+        try {
+            res = db.rawQuery("select * from endereco", null);
+            res.moveToFirst();
+            while (!res.isAfterLast()) {
+                Address adress = new Address();
+                adress.setId(res.getInt(0));
+                adress.setAdress(res.getString(1));
+                adress.setNeighborhood(res.getString(2));
+                adress.setCity(res.getString(3));
+                adress.setUf(res.getString(4));
+                addressList.add(adress);
+                res.moveToNext();
+            }
+            return addressList;
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            db.close();
+        }
     }
 }

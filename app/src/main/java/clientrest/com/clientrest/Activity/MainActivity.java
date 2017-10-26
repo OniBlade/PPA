@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.HistoryObject;
 import clientrest.com.clientrest.DataBase.Entity.Scenarios;
 import clientrest.com.clientrest.Frament.Configuration_Fragment;
@@ -36,6 +36,7 @@ import clientrest.com.clientrest.Frament.History_List_Fragment;
 import clientrest.com.clientrest.Frament.Request_Fragment;
 import clientrest.com.clientrest.Frament.Request_List_Fragment;
 import clientrest.com.clientrest.R;
+import clientrest.com.clientrest.Service.MLP;
 import clientrest.com.clientrest.dummy.DummyContent;
 
 public class MainActivity extends AppCompatActivity
@@ -255,7 +256,8 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }else{
-
+            MLP mlp = new MLP(context);
+            mlp.RetrainMLP();
         }
     }
 

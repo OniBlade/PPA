@@ -14,7 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import clientrest.com.clientrest.Adapter.History_Items_Adapter;
-import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.HistoryObject;
 import clientrest.com.clientrest.R;
 

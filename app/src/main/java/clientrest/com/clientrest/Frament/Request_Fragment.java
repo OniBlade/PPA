@@ -22,7 +22,7 @@ import java.util.List;
 
 import clientrest.com.clientrest.Activity.MainActivity;
 import clientrest.com.clientrest.Adapter.Request_Items_Adapter;
-import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.ConsumerAttributes;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;

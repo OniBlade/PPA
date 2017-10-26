@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import clientrest.com.clientrest.Adapter.Request_Adapter;
-import clientrest.com.clientrest.DataBase.DBHelper;
+import clientrest.com.clientrest.DataBase.DAO.DBHelper;
 import clientrest.com.clientrest.DataBase.Entity.Request;
 import clientrest.com.clientrest.R;
 import clientrest.com.clientrest.dummy.DummyContent.DummyItem;

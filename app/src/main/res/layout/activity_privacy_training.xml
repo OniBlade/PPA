@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:elevation="3dp"
                 android:paddingBottom="5dp"
-                android:text="Cenário 1"
+                android:text="Cenário"
                 android:textAlignment="center"
                 android:textColor="@color/colorPrimarytext"
                 android:textSize="16sp"

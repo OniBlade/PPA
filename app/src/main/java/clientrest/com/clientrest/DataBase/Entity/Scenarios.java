@@ -10,9 +10,18 @@ public class Scenarios {
     private String scenario;
     private int state;
     private int decision;
+    private int trainingSetId;
 
     public int getDecision() {
         return decision;
+    }
+
+    public int getTrainingSetId() {
+        return trainingSetId;
+    }
+
+    public void setTrainingSetId(int trainingSetId) {
+        this.trainingSetId = trainingSetId;
     }
 
     public void setDecision(int decision) {

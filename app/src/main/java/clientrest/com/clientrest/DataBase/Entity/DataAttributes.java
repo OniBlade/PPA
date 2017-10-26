@@ -19,7 +19,7 @@ public class DataAttributes  {
     private String retention;
     private Integer inferred;
     private Integer dataId;
-    private String user_benefit;
+    //private String user_benefit;
     private Integer trainingSetId;
 
     public DataAttributes() {
@@ -33,13 +33,6 @@ public class DataAttributes  {
         this.trainingSetId = trainingSetId;
     }
 
-    public String getUser_benefit() {
-        return user_benefit;
-    }
-
-    public void setUser_benefit(String user_benefit) {
-        this.user_benefit = user_benefit;
-    }
 
     public DataAttributes(Integer dataAttributesId) {
         this.dataAttributesId = dataAttributesId;
